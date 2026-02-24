@@ -1,31 +1,3 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* 한심지수 · 전적 요약 페이지 스타일 */
 :root {
   --bg: #0b0c10;
   --card: #13151a;
@@ -35,14 +7,10 @@ body {
   --sub: #aab2c0;
   --accent: #4fc3f7;
 }
-.hansim-root,
-.hansim-root * {
+* {
   box-sizing: border-box;
 }
-.hansim-root {
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
+body {
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -51,6 +19,9 @@ body {
     Apple SD Gothic Neo,
     Noto Sans KR,
     sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
 }
 .wrap {
   max-width: 980px;
@@ -70,7 +41,7 @@ body {
   object-fit: contain;
   filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
 }
-.wrap h1 {
+h1 {
   font-size: 20px;
   margin: 6px 0 6px;
 }
@@ -98,7 +69,7 @@ body {
   align-items: center;
   gap: 8px;
 }
-.wrap select {
+select {
   background: #11141a;
   color: #e6e6e6;
   border: 1px solid #2a2f3a;
@@ -163,8 +134,7 @@ body {
   border-radius: 999px;
   border: 1px solid #2c3240;
 }
-.wrap + footer,
-.wrap footer {
+footer {
   margin-top: 18px;
   color: #9aa3b2;
   font-size: 12px;
