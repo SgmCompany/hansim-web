@@ -11,7 +11,7 @@ type HomeViewProps = {
 };
 
 export function HomeView({ players, periodStr }: HomeViewProps) {
-  const logoUrl = process.env.NEXT_PUBLIC_LOGO_URL ?? '/sg-logo.png';
+  const logoUrl = process.env.NEXT_PUBLIC_LOGO_URL;
   const [summoner, setSummoner] = useState<string>(SummonerFilter.ALL);
   const [queue, setQueue] = useState<'all' | QueueKey>('all');
 
