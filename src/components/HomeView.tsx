@@ -11,6 +11,7 @@ type HomeViewProps = {
 };
 
 export function HomeView({ players, periodStr }: HomeViewProps) {
+  const logoUrl = process.env.NEXT_PUBLIC_LOGO_URL;
   const [summoner, setSummoner] = useState<string>(SummonerFilter.ALL);
   const [queue, setQueue] = useState<'all' | QueueKey>('all');
 
@@ -42,8 +43,7 @@ export function HomeView({ players, periodStr }: HomeViewProps) {
       <div className="wrap">
         {/* ---- 헤더: 로고 ---- */}
         <div className="logo">
-          {/* 로고 필요 시 public/logo.png 추가 후 사용 */}
-          {/* <img src="/logo.png" alt="SG 로고" /> */}
+          <img src={logoUrl} alt="SGM Company 로고" />
         </div>
 
         {/* ---- 헤더: 제목, 집계 기간 ---- */}
