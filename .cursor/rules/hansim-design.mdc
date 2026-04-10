@@ -1,0 +1,137 @@
+---
+description: Apply "The Cheerful Engineer" design system - No-Line Rule, extreme roundness (32px+), Manrope typography, Light-Mode First
+globs: "**/*.{tsx,jsx,css}"
+alwaysApply: false
+---
+
+# Hansim Design System: The Cheerful Engineer
+
+## Core Principles
+
+1. **No-Line Rule**: Never use 1px borders. Use background color shifts.
+2. **Extreme Roundness**: Minimum 16px, prefer 32px+ (3rem).
+3. **Soft Engineering**: Precise data + friendly UI.
+4. **Light-Mode First**: Bright, welcoming experience.
+
+## Essential Colors
+
+```tsx
+// Primary
+bg-primary              // #006A35 - Logic Green
+bg-primary-dim          // #005C2D - Gradient
+bg-primary-container    // #6BFE9C - Highlight Glow
+
+// Surfaces (Tonal Layering)
+bg-surface                     // #F5F6F7 - Global
+bg-surface-container-low       // #EFF1F2 - Zones
+bg-surface-container-lowest    // #FFFFFF - Cards
+bg-surface-container-high      // #E0E3E4 - Chips
+
+// Text
+text-on-surface          // #2C2F30 - NOT black
+text-on-surface-variant  // #595C5D - Secondary
+text-primary             // #006A35 - Accent
+```
+
+## Component Patterns
+
+### Cards (No-Line Rule)
+
+```tsx
+// ✅ Correct
+<div className="bg-surface-container-lowest p-10 rounded-[3rem] no-line-boundary">
+
+// ❌ Wrong
+<div className="bg-white p-10 rounded-lg border border-gray-200">
+```
+
+### Buttons
+
+```tsx
+// Primary CTA - Gradient + pill
+<button className="px-10 py-5 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-full font-extrabold hover:scale-105 active:scale-95 transition-all">
+
+// Secondary
+<button className="px-6 py-3 bg-surface-container-lowest rounded-full font-bold hover:bg-surface-container-low transition-colors">
+```
+
+### Typography
+
+```tsx
+// Hero: text-5xl md:text-7xl font-black tracking-tighter
+// Section: text-2xl font-black tracking-tight
+// Card: text-lg font-bold
+// Meta: text-[10px] font-black uppercase tracking-widest
+```
+
+## Critical Rules
+
+### ✅ Always Do
+
+- Use `no-line-boundary` instead of `shadow-lg`
+- Use `rounded-[3rem]` for major cards
+- Use `toLocaleString()` for numbers (1,248 not 1248)
+- Use `text-on-surface` (#2C2F30) not pure black
+- Use gradient for primary CTAs: `bg-gradient-to-br from-primary to-primary-dim`
+- Apply `hover:scale-105` to interactive elements
+
+### ❌ Never Do
+
+- Never use `border` or `border-gray-*`
+- Never use `rounded-sm` or `rounded-md` (too sharp)
+- Never use `text-black` or `#000000`
+- Never use flat `bg-primary` for buttons (use gradient)
+- Never use `shadow-xl` or `shadow-2xl` (too harsh)
+
+## Layout
+
+### Max Width
+```tsx
+max-w-screen-2xl  // Home page
+max-w-6xl         // Detail pages
+max-w-4xl         // Leaderboard
+max-w-3xl         // Search bar
+```
+
+### Spacing (4px Grid)
+```tsx
+gap-6    // 24px
+p-8      // 32px
+mb-10    // 40px
+mb-24    // 96px
+```
+
+## Quick Examples
+
+### Search Input
+```tsx
+<input className="w-full pl-14 pr-6 py-5 bg-surface-container rounded-full border-none focus:ring-4 focus:ring-primary-container text-lg font-semibold placeholder:text-outline-variant outline-none" />
+```
+
+### Stats Card
+```tsx
+<div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+  <div className="flex items-center gap-3 mb-4">
+    <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary">
+      <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+        swords
+      </span>
+    </div>
+    <span className="font-black text-on-surface">KDA</span>
+  </div>
+  <div className="flex items-baseline gap-2 mb-2">
+    <span className="text-4xl font-black text-primary">3.82:1</span>
+    <span className="text-on-surface-variant font-bold text-sm">평균</span>
+  </div>
+  <div className="mt-8 pt-6 border-t border-outline-variant/15">
+    <span className="text-xs font-bold text-on-surface-variant">킬 관여율</span>
+    <span className="text-sm font-black text-on-surface">62%</span>
+  </div>
+</div>
+```
+
+## Reference
+
+- Full colors: [COLOR_REFERENCE.md](../docs/COLOR_REFERENCE.md)
+- Examples: [EXAMPLES.md](../docs/EXAMPLES.md)
+- Philosophy: [stitch/DESIGN.md](../stitch/DESIGN.md)
