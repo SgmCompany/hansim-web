@@ -23,7 +23,7 @@ export class ApiError extends Error {
 }
 
 export interface ApiRequestConfig extends RequestInit {
-  params?: Record<string, string | number | boolean>;
+  params?: Record<string, string | number | boolean | null | undefined>;
   skipAuth?: boolean;
 }
 

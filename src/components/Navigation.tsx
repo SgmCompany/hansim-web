@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { logout } from '@/src/lib/auth/logout';
 
 type NavigationProps = {
-  currentPage?: 'home' | 'leaderboard' | 'multi';
+  currentPage?: 'home';
   isHomePage?: boolean;
 };
 
@@ -27,67 +27,10 @@ export function Navigation({ currentPage = 'home', isHomePage = false }: Navigat
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl no-line tonal-layering">
       <div className={`flex justify-between items-center px-8 h-20 w-full ${maxWidth} mx-auto`}>
-        {/* Logo & Menu */}
-        {isHomePage ? (
-          <>
-            <div className="text-2xl font-black tracking-tighter text-primary">한심지수</div>
-            <div className="hidden md:flex items-center gap-8 font-bold text-sm tracking-tight">
-              <Link href="/" className="text-primary font-extrabold border-b-4 border-primary pb-1">
-                홈
-              </Link>
-              <Link
-                href="/leaderboard"
-                className="text-zinc-500 font-medium hover:text-zinc-900 transition-all"
-              >
-                리더보드
-              </Link>
-              <Link
-                href="/multi"
-                className="text-zinc-500 font-medium hover:text-zinc-900 transition-all"
-              >
-                멀티검색
-              </Link>
-            </div>
-          </>
-        ) : (
-          <div className="flex items-center gap-12">
-            <Link href="/" className="text-2xl font-black tracking-tighter text-primary">
-              한심지수
-            </Link>
-            <div className="hidden md:flex items-center gap-8 font-bold text-sm tracking-tight">
-              <Link
-                href="/"
-                className={
-                  currentPage === 'home'
-                    ? 'text-primary font-extrabold border-b-4 border-primary pb-1'
-                    : 'text-zinc-500 font-medium hover:text-zinc-900 transition-all'
-                }
-              >
-                홈
-              </Link>
-              <Link
-                href="/leaderboard"
-                className={
-                  currentPage === 'leaderboard'
-                    ? 'text-primary font-extrabold border-b-4 border-primary pb-1'
-                    : 'text-zinc-500 font-medium hover:text-zinc-900 transition-all'
-                }
-              >
-                리더보드
-              </Link>
-              <Link
-                href="/multi"
-                className={
-                  currentPage === 'multi'
-                    ? 'text-primary font-extrabold border-b-4 border-primary pb-1'
-                    : 'text-zinc-500 font-medium hover:text-zinc-900 transition-all'
-                }
-              >
-                한심대결
-              </Link>
-            </div>
-          </div>
-        )}
+        {/* Logo */}
+        <Link href="/" className="text-2xl font-black tracking-tighter text-primary">
+          한심지수
+        </Link>
 
         {/* Search & Account */}
         <div className="flex items-center gap-4">

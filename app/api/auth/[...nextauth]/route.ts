@@ -57,6 +57,7 @@ const handler = NextAuth({
       if (account?.id_token) {
         token.googleIdToken = account.id_token;
       }
+      console.log('account:', account?.id_token);
 
       // 백엔드 JWT (실제 API 인증에 사용)
       if (account?.backend_jwt) {
