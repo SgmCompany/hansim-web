@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import { loginWithGoogle } from '@/src/lib/api/services/authService';
 
 const handler = NextAuth({
   providers: [
@@ -17,7 +18,27 @@ const handler = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // 회원가입/로그인 시 추가 로직
+      if (account?.provider === 'google' && account?.id_token) {
+        try {
+          // 백엔드에 Google ID Token 전송
+          const backendAuth = await loginWithGoogle(account.id_token);
+
+          // 백엔드 JWT를 account에 임시 저장 (jwt 콜백에서 사용)
+          account.backend_jwt = backendAuth.accessToken;
+
+          return true;
+        } catch (error) {
+          console.error('백엔드 로그인 실패 상세:', {
+            error,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+
+          // 백엔드 실패해도 NextAuth 로그인은 허용 (개발 편의)
+          return true;
+        }
+      }
+
       return true;
     },
     async session({ session, token }) {
@@ -34,12 +55,20 @@ const handler = NextAuth({
       if (user) {
         token.id = user.id;
       }
+
+      // Google OAuth 토큰
       if (account?.access_token) {
-        token.accessToken = account.access_token;
+        token.googleAccessToken = account.access_token;
       }
       if (account?.id_token) {
-        token.idToken = account.id_token;
+        token.googleIdToken = account.id_token;
       }
+
+      // 백엔드 JWT (실제 API 인증에 사용)
+      if (account?.backend_jwt) {
+        token.accessToken = account.backend_jwt;
+      }
+
       return token;
     },
   },

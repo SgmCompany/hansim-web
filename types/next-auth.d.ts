@@ -16,7 +16,14 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id?: string;
-    accessToken?: string;
-    idToken?: string;
+    accessToken?: string; // 백엔드 JWT (실제 API 인증용)
+    googleAccessToken?: string; // Google OAuth Access Token
+    googleIdToken?: string; // Google OAuth ID Token
+  }
+}
+
+declare module "next-auth" {
+  interface Account {
+    backend_jwt?: string; // 백엔드 JWT 임시 저장용
   }
 }

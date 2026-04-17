@@ -15,7 +15,7 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     public statusText: string,
-    public data?: any
+    public data?: any,
   ) {
     super(`API Error: ${status} ${statusText}`);
     this.name = 'ApiError';
@@ -44,15 +44,12 @@ export function addResponseInterceptor(interceptor: ResponseInterceptor) {
 /**
  * API 요청 함수
  */
-export async function apiRequest<T>(
-  endpoint: string,
-  config: ApiRequestConfig = {}
-): Promise<T> {
+export async function apiRequest<T>(endpoint: string, config: ApiRequestConfig = {}): Promise<T> {
   const { params, skipAuth = false, ...fetchConfig } = config;
 
   // URL 생성
   const url = new URL(endpoint, BASE_URL);
-  
+
   // Query parameters 추가
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -70,7 +67,7 @@ export async function apiRequest<T>(
   if (typeof window !== 'undefined' && !skipAuth) {
     const { getSession } = await import('next-auth/react');
     const session = await getSession();
-    
+
     if (session?.accessToken) {
       headers = {
         ...headers,
@@ -113,7 +110,15 @@ export async function apiRequest<T>(
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new Error(`Network error: ${error}`);
+
+    // 상세한 에러 로그
+    console.error('API Request Failed:', {
+      url: url.toString(),
+      method: requestConfig.method,
+      error: error instanceof Error ? error.message : error,
+    });
+
+    throw new Error(`Network error: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -127,11 +132,7 @@ export function apiGet<T>(endpoint: string, config?: ApiRequestConfig): Promise<
 /**
  * POST 요청
  */
-export function apiPost<T>(
-  endpoint: string,
-  data?: any,
-  config?: ApiRequestConfig
-): Promise<T> {
+export function apiPost<T>(endpoint: string, data?: any, config?: ApiRequestConfig): Promise<T> {
   return apiRequest<T>(endpoint, {
     ...config,
     method: 'POST',
@@ -142,11 +143,7 @@ export function apiPost<T>(
 /**
  * PUT 요청
  */
-export function apiPut<T>(
-  endpoint: string,
-  data?: any,
-  config?: ApiRequestConfig
-): Promise<T> {
+export function apiPut<T>(endpoint: string, data?: any, config?: ApiRequestConfig): Promise<T> {
   return apiRequest<T>(endpoint, {
     ...config,
     method: 'PUT',
@@ -157,11 +154,7 @@ export function apiPut<T>(
 /**
  * PATCH 요청
  */
-export function apiPatch<T>(
-  endpoint: string,
-  data?: any,
-  config?: ApiRequestConfig
-): Promise<T> {
+export function apiPatch<T>(endpoint: string, data?: any, config?: ApiRequestConfig): Promise<T> {
   return apiRequest<T>(endpoint, {
     ...config,
     method: 'PATCH',

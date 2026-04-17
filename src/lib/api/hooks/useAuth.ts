@@ -2,44 +2,27 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 import * as authService from '../services/authService';
 
-/**
- * 백엔드 회원가입/로그인 요청 타입
- */
-export interface AuthGoogleRequest {
-  idToken: string;
-  accessToken: string;
-}
+import type { paths } from '@/src/types/api.generated';
 
-export interface AuthResponse {
-  accessToken: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    profileImage?: string;
-  };
-}
+/**
+ * 백엔드 API 타입
+ */
+type AuthResponse = paths['/api/v1/auth/google']['post']['responses']['200']['content']['*/*'];
 
 /**
  * 회원가입/로그인 (Google)
- * Google OAuth 완료 후 백엔드에 토큰 전송
+ * Google OAuth 완료 후 백엔드에 ID Token 전송
  */
 export function useGoogleAuth() {
-  const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (googleTokens: AuthGoogleRequest) => {
-      return authService.loginWithGoogle(
-        googleTokens.idToken,
-        googleTokens.accessToken
-      );
+    mutationFn: async (googleToken: string) => {
+      return authService.loginWithGoogle(googleToken);
     },
-    onSuccess: (data) => {
-      // 백엔드에서 받은 JWT를 NextAuth 세션에 저장
-      console.log('백엔드 로그인 성공:', data);
-      
-      // 사용자 정보 캐시
-      queryClient.setQueryData(['user', 'me'], data.user);
+    onSuccess: (data: AuthResponse) => {
+      // 백엔드에서 받은 JWT를 로컬에 저장
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('hansim_access_token', data.accessToken);
+      }
     },
     onError: (error) => {
       console.error('백엔드 로그인 실패:', error);
