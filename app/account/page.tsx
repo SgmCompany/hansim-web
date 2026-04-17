@@ -1,10 +1,11 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Navigation } from '@/src/components/Navigation';
 import { Footer } from '@/src/components/Footer';
+import { logout, deleteAccount } from '@/src/lib/auth/logout';
 
 export default function AccountPage() {
   const { data: session, status } = useSession();
@@ -33,19 +34,17 @@ export default function AccountPage() {
     setIsDeleting(true);
 
     try {
-      const response = await fetch('/api/user/delete', {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        await signOut({ callbackUrl: '/' });
-      } else {
+      const result = await deleteAccount();
+      
+      if (!result.success) {
         alert('회원탈퇴 처리 중 오류가 발생했습니다.');
+        setIsDeleting(false);
+        setShowConfirm(false);
       }
+      // 성공 시 logout()에서 자동으로 홈으로 리다이렉트
     } catch (error) {
       console.error('회원탈퇴 오류:', error);
       alert('회원탈퇴 처리 중 오류가 발생했습니다.');
-    } finally {
       setIsDeleting(false);
       setShowConfirm(false);
     }
@@ -77,7 +76,7 @@ export default function AccountPage() {
 
           <div className="pt-6 border-t border-outline-variant/15">
             <button
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={logout}
               className="px-6 py-3 bg-surface-container-high hover:bg-surface-container rounded-full font-bold transition-colors"
             >
               로그아웃

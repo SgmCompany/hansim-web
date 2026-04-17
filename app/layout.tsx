@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import { AuthProvider } from "@/src/providers/SessionProvider";
+import { QueryProvider } from "@/src/providers/QueryProvider";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -29,9 +30,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${manrope.variable} antialiased bg-surface text-on-surface`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

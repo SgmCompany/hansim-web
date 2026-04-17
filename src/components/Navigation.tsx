@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
+import { logout } from '@/src/lib/auth/logout';
 
 type NavigationProps = {
   currentPage?: 'home' | 'leaderboard' | 'multi';
@@ -110,7 +111,7 @@ export function Navigation({ currentPage = 'home', isHomePage = false }: Navigat
           ) : session ? (
             <div className="flex items-center gap-3">
               <button
-                onClick={() => signOut({ callbackUrl: '/' })}
+                onClick={logout}
                 className="px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors"
               >
                 로그아웃
