@@ -28,14 +28,8 @@ const handler = NextAuth({
 
           return true;
         } catch (error) {
-          console.error('백엔드 로그인 실패 상세:', {
-            error,
-            message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-          });
-
-          // 백엔드 실패해도 NextAuth 로그인은 허용 (개발 편의)
-          return true;
+          console.error('백엔드 로그인 실패:', error);
+          return false;
         }
       }
 
