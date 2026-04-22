@@ -24,7 +24,7 @@ export function getDaysDifference(startDate: Date, endDate: Date): number {
 }
 
 /**
- * 날짜 범위 검증 (최대 30일)
+ * 날짜 범위 검증 (최대 7일)
  */
 export function isValidDateRange(startDate: Date, endDate: Date): {
   valid: boolean;
@@ -35,8 +35,8 @@ export function isValidDateRange(startDate: Date, endDate: Date): {
   }
 
   const daysDiff = getDaysDifference(startDate, endDate);
-  if (daysDiff > 30) {
-    return { valid: false, error: '최대 30일까지 선택 가능합니다.' };
+  if (daysDiff > 7) {
+    return { valid: false, error: '최대 7일까지 선택 가능합니다.' };
   }
 
   return { valid: true };

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { formatDateToInput, getToday, isValidDateRange } from '@/src/utils/date';
+import { DateRangePicker } from './DateRangePicker';
 
 type HeroSectionProps = {
   onSearch?: (summonerNames: string[], startDate: string, endDate: string) => void;
@@ -54,53 +55,14 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
     return `${startDate} ~ ${endDate}`;
   };
 
-  // 시작일 변경 핸들러: 종료일이 30일 초과 시 자동 조정
   const handleStartDateChange = (newStartDate: string) => {
     setStartDate(newStartDate);
     setDateError('');
-
-    // 현재 종료일이 새 시작일로부터 30일을 초과하는지 확인
-    const start = new Date(newStartDate);
-    const end = new Date(endDate);
-    const diffTime = end.getTime() - start.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays > 30) {
-      // 30일 후의 날짜로 종료일 자동 조정
-      const maxEndDate = new Date(start);
-      maxEndDate.setDate(maxEndDate.getDate() + 30);
-
-      // 오늘을 넘지 않도록
-      const todayDate = new Date(today);
-      const adjustedEndDate = maxEndDate > todayDate ? todayDate : maxEndDate;
-
-      setEndDate(formatDateToInput(adjustedEndDate));
-    }
   };
 
-  // 종료일 변경 핸들러: 시작일로부터 30일 이내인지 확인
   const handleEndDateChange = (newEndDate: string) => {
     setEndDate(newEndDate);
     setDateError('');
-  };
-
-  // 시작일 기준 최대 종료일 계산 (30일 후 또는 오늘 중 더 이른 날짜)
-  const getMaxEndDate = () => {
-    const start = new Date(startDate);
-    const maxDate = new Date(start);
-    maxDate.setDate(maxDate.getDate() + 30);
-
-    const todayDate = new Date(today);
-    return formatDateToInput(maxDate > todayDate ? todayDate : maxDate);
-  };
-
-  // 종료일 기준 최소 시작일 계산 (30일 전)
-  const getMinStartDate = () => {
-    const end = new Date(endDate);
-    const minDate = new Date(end);
-    minDate.setDate(minDate.getDate() - 30);
-
-    return formatDateToInput(minDate);
   };
 
   return (
@@ -160,47 +122,19 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
           </button>
         </div>
 
-        {/* Date Picker Dropdown - 검색바 아래에 배치 */}
+        {/* Date Range Picker - 검색바 아래에 배치 */}
         {showDatePicker && (
-          <div className="mt-4 bg-surface-container-lowest p-6 rounded-3xl no-line-boundary animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-              <div className="flex-1">
-                <label className="block text-sm font-bold text-on-surface-variant mb-2">
-                  시작일
-                </label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => handleStartDateChange(e.target.value)}
-                  min={getMinStartDate()}
-                  max={endDate}
-                  className="w-full px-4 py-3 bg-surface-container rounded-2xl border-none focus:ring-4 focus:ring-primary-container text-on-surface font-semibold outline-none"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-bold text-on-surface-variant mb-2">
-                  종료일
-                </label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => handleEndDateChange(e.target.value)}
-                  min={startDate}
-                  max={getMaxEndDate()}
-                  className="w-full px-4 py-3 bg-surface-container rounded-2xl border-none focus:ring-4 focus:ring-primary-container text-on-surface font-semibold outline-none"
-                />
-              </div>
-            </div>
-            {dateError && (
-              <p className="mt-3 text-error text-sm font-semibold">
-                <span className="material-symbols-outlined icon-sm align-middle mr-1">error</span>
-                {dateError}
-              </p>
-            )}
-            <p className="mt-3 text-on-surface-variant text-xs">최대 30일까지 선택 가능합니다.</p>
+          <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={handleStartDateChange}
+              onEndDateChange={handleEndDateChange}
+              error={dateError}
+            />
 
-            {/* 안내 문구를 모달 내부로 이동 */}
-            <p className="mt-4 pt-4 border-t border-outline-variant/20 text-on-surface-variant font-medium text-sm">
+            {/* 안내 문구 */}
+            <p className="mt-4 text-on-surface-variant font-medium text-sm">
               <span className="material-symbols-outlined icon-sm align-middle text-primary mr-1">
                 info
               </span>
