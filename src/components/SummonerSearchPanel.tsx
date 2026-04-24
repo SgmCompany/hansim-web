@@ -6,7 +6,7 @@ import { formatDateToInput, getToday, isValidDateRange } from '@/src/utils/date'
 import { DateRangePicker } from './DateRangePicker';
 
 export const SUMMONER_SEARCH_INFO =
-  '소환사 검색과 날짜(기간, 최대 7일) 검색을 함께 사용해 조회할 수 있습니다. 여러 명의 소환사는 쉼표(,)로 구분하여 한 번에 검색할 수 있습니다. (예: 페이커#KR1, 쇼메이커#KR1)';
+  '소환사명·기간(최대 7일)으로 검색합니다. 여러 명은 쉼표(,)로 구분 — 예: 페이커#KR1, 쇼메이커#KR1';
 
 export type SummonerSearchPanelProps = {
   onSearch: (summonerNames: string[], startDate: string, endDate: string) => void;
@@ -204,10 +204,10 @@ export function SummonerSearchPanel({
           aria-expanded={showDatePicker}
           aria-haspopup="dialog"
           aria-controls={dialogId}
-          className="min-h-[3.25rem] w-full md:w-auto flex items-center gap-2 px-4 sm:px-5 md:px-6 py-4 sm:py-6 bg-surface-container hover:bg-surface-container-high transition-colors rounded-full text-on-surface-variant font-bold min-w-0 active:scale-[0.98]"
+          className="min-h-[3.25rem] sm:min-h-14 w-full md:w-auto md:min-w-[17.5rem] lg:min-w-[19rem] md:shrink-0 flex items-center gap-2 px-4 sm:px-5 md:px-6 py-4 sm:py-6 bg-surface-container hover:bg-surface-container-high transition-colors rounded-full text-on-surface-variant font-bold active:scale-[0.98]"
         >
           <span className="material-symbols-outlined shrink-0 text-xl">calendar_today</span>
-          <span className="min-w-0 flex-1 md:flex-initial truncate text-left text-sm sm:text-base md:text-lg">
+          <span className="min-w-0 flex-1 truncate text-left text-sm sm:text-base md:text-lg">
             {getDateRangeText()}
           </span>
           <span

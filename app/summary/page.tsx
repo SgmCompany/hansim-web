@@ -164,7 +164,7 @@ function ResultContent() {
           </div>
           <SummonerSearchPanel
             formIdPrefix="summary-edit"
-            showInfoText={false}
+            showInfoText
             initialSummonerInput={initialSummonerInput}
             initialStartDate={initialStart}
             initialEndDate={initialEnd}
