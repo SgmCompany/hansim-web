@@ -35,7 +35,7 @@ export function useLeaderboard(page = 1, pageSize = 10) {
 }
 
 /**
- * 실시간 리더보드 (자동 갱신)
+ * 한심왕 (자동 갱신)
  */
 export function useRealtimeLeaderboard(limit = 10) {
   return useQuery({

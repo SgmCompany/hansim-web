@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Navigation } from '../src/components/Navigation';
 import { HeroSection } from '../src/components/HeroSection';
 import { LeaderboardSection } from '../src/components/LeaderboardSection';
@@ -37,10 +38,27 @@ const mockLeaderboard = [
 ];
 
 export default function HomePage() {
-  const handleSearch = (summonerNames: string[], dateRange: string) => {
-    console.log('검색:', summonerNames, dateRange);
-    // TODO: API 호출 또는 라우팅
-    // router.push(`/summoner/${summonerNames.join(',')}`);
+  const router = useRouter();
+
+  const handleSearch = (summonerNames: string[], startDate: string, endDate: string) => {
+    // 단일 소환사 검색 시 summoner/[name] 페이지로 이동
+    if (summonerNames.length === 1) {
+      const queryString = new URLSearchParams({
+        startDate,
+        endDate,
+      }).toString();
+      router.push(`/summoner/${encodeURIComponent(summonerNames[0])}?${queryString}`);
+      return;
+    }
+
+    // 다중 소환사 검색 시 summary 페이지로 이동
+    const queryString = new URLSearchParams({
+      summoners: summonerNames.join(','),
+      startDate,
+      endDate,
+    }).toString();
+
+    router.push(`/summary?${queryString}`);
   };
 
   return (

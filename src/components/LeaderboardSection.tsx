@@ -19,15 +19,9 @@ export function LeaderboardSection({ players }: LeaderboardSectionProps) {
       <div className="w-full max-w-4xl bg-surface-container-lowest p-10 hansim-card no-line-boundary">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h3 className="text-2xl font-black tracking-tight mb-1">실시간 리더보드</h3>
-            <p className="text-on-surface-variant text-sm">한심지수 기준 최고 득점 플레이어</p>
+            <h3 className="text-2xl font-black tracking-tight mb-1">한심왕</h3>
+            <p className="text-on-surface-variant text-sm">관심 유저 기준 최고의 한심한 소환사</p>
           </div>
-          <Link
-            href="/leaderboard"
-            className="px-5 py-2 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold hover:scale-105 transition-all"
-          >
-            전체보기
-          </Link>
         </div>
 
         <div className="space-y-6">
@@ -69,7 +63,9 @@ export function LeaderboardSection({ players }: LeaderboardSectionProps) {
                   >
                     {player.tier}
                   </span>
-                  <span className="text-sm font-bold text-on-surface-variant">{player.lp.toLocaleString()} LP</span>
+                  <span className="text-sm font-bold text-on-surface-variant">
+                    {player.lp.toLocaleString()} LP
+                  </span>
                 </div>
               </div>
 
