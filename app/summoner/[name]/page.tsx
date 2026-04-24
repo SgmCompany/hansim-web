@@ -112,8 +112,8 @@ function SummonerContent({ name }: { name: string }) {
 
   return (
     <>
-      <div className="mb-6 bg-surface-container-lowest p-6 rounded-3xl no-line-boundary">
-        <p className="text-center text-on-surface-variant font-semibold">
+      <div className="mb-6 bg-surface-container-lowest p-4 sm:p-6 rounded-3xl no-line-boundary">
+        <p className="text-center text-on-surface-variant font-semibold text-sm sm:text-base break-words leading-relaxed">
           <span className="material-symbols-outlined icon-sm align-middle mr-2">calendar_today</span>
           {data.periodStr}
         </p>
@@ -131,7 +131,7 @@ export default function SummonerDetailPage({ params }: PageProps) {
     <div className="min-h-screen flex flex-col bg-surface">
       <Navigation />
 
-      <main className="flex-1 pt-32 pb-20 px-8 lg:px-12 max-w-6xl mx-auto w-full">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(4rem+env(safe-area-inset-bottom,0px))]">
         <Suspense
           fallback={
             <div className="flex items-center justify-center min-h-[400px]">

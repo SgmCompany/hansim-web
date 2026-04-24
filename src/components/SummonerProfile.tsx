@@ -34,8 +34,8 @@ export function SummonerProfile({ summoner }: SummonerProfileProps) {
   };
 
   return (
-    <header className="bg-surface-container-lowest p-8 rounded-3xl no-line-boundary mb-6">
-      <div className="flex items-start gap-6">
+    <header className="bg-surface-container-lowest p-4 sm:p-6 lg:p-8 rounded-3xl no-line-boundary mb-6">
+      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
         <div className="relative">
           <div className="w-24 h-24 rounded-2xl bg-surface-container overflow-hidden">
             <img
@@ -49,13 +49,15 @@ export function SummonerProfile({ summoner }: SummonerProfileProps) {
           </div>
         </div>
 
-        <div className="flex-1">
-          <h1 className="text-3xl font-black text-on-surface mb-2">{summoner.name}</h1>
-          
+        <div className="flex-1 min-w-0 w-full">
+          <h1 className="text-xl sm:text-3xl font-black text-on-surface mb-2 break-words">
+            {summoner.name}
+          </h1>
+
           {/* 랭크 정보 */}
-          <div className="flex gap-4 mb-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-2 mb-2">
             {summoner.soloRank && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-bold text-on-surface-variant">솔로</span>
                 <span className={`font-black ${summoner.tierColor}`}>
                   {summoner.soloRank.tier} {summoner.soloRank.rank}
@@ -66,7 +68,7 @@ export function SummonerProfile({ summoner }: SummonerProfileProps) {
               </div>
             )}
             {summoner.flexRank && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-bold text-on-surface-variant">자유</span>
                 <span className={`font-black ${summoner.tierColor}`}>
                   {summoner.flexRank.tier} {summoner.flexRank.rank}

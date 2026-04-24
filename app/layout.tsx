@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 import { AuthProvider } from '@/src/providers/SessionProvider';
 import { QueryProvider } from '@/src/providers/QueryProvider';
@@ -16,6 +16,13 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: '한심지수 - HanSim Level Score, HLS',
   description: '당신의 한심지수를 알아보세요. League of Legends 전적 분석 서비스',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#f5f6f7',
 };
 
 export default function RootLayout({

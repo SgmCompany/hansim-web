@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* 모바일 웹(Safari 등): 자동 글자 확대·가로 스크롤 억제 */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: clip;
+}
+
 @theme {
   /* Colors */
   --color-primary: #006a35;

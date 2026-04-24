@@ -19,9 +19,9 @@ type StatsGridProps = {
 
 export function StatsGrid({ stats }: StatsGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
       {/* Win Rate Circular Card */}
-      <div className="bg-surface-container-lowest rounded-xl p-8 flex flex-col items-center justify-center text-center shadow-sm h-full">
+      <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col items-center justify-center text-center shadow-sm h-full">
         <h3 className="text-sm font-bold text-on-surface-variant mb-6 tracking-widest uppercase">
           승률
         </h3>
@@ -58,7 +58,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
         </div>
       </div>
         {/* KDA Card */}
-        <div className="bg-surface-container-lowest rounded-xl p-8 flex flex-col shadow-sm h-full">
+        <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col shadow-sm h-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary">
               <span className="material-symbols-outlined filled">
@@ -82,7 +82,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
         </div>
 
         {/* CS/Min Card */}
-        <div className="bg-surface-container-lowest rounded-xl p-8 flex flex-col shadow-sm h-full">
+        <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col shadow-sm h-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
               <span className="material-symbols-outlined filled">
@@ -103,7 +103,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
         </div>
 
         {/* Vision Score Card */}
-        <div className="bg-surface-container-lowest rounded-xl p-8 flex flex-col shadow-sm h-full">
+        <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col shadow-sm h-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-tertiary">
               <span className="material-symbols-outlined filled">

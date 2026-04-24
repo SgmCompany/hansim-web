@@ -84,8 +84,8 @@ function ResultContent() {
   return (
     <div className="space-y-8">
       {/* 조회 기간 표시 */}
-      <div className="bg-surface-container-lowest p-6 rounded-3xl no-line-boundary">
-        <p className="text-center text-on-surface-variant font-semibold">
+      <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-3xl no-line-boundary">
+        <p className="text-center text-on-surface-variant font-semibold text-sm sm:text-base break-words leading-relaxed">
           <span className="material-symbols-outlined icon-sm align-middle mr-2">
             calendar_today
           </span>
@@ -114,9 +114,9 @@ function PlayerCard({ player }: { player: Player }) {
   };
 
   return (
-    <div className="bg-surface-container-lowest p-8 rounded-3xl no-line-boundary">
+    <div className="bg-surface-container-lowest p-4 sm:p-6 lg:p-8 rounded-3xl no-line-boundary">
       {/* 헤더: 소환사 정보 */}
-      <div className="flex items-start gap-6 mb-6 pb-6 border-b border-outline-variant/20">
+      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 pb-6 border-b border-outline-variant/20">
         <div className="relative">
           <div className="w-24 h-24 rounded-2xl bg-surface-container overflow-hidden">
             <img
@@ -130,13 +130,15 @@ function PlayerCard({ player }: { player: Player }) {
           </div>
         </div>
 
-        <div className="flex-1">
-          <h2 className="text-3xl font-black text-on-surface mb-2">{player.riotId}</h2>
+        <div className="flex-1 min-w-0 w-full">
+          <h2 className="text-xl sm:text-3xl font-black text-on-surface mb-2 break-words">
+            {player.riotId}
+          </h2>
 
           {/* 랭크 정보 */}
-          <div className="flex gap-4 mb-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-2 mb-2">
             {player.soloRank && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-bold text-on-surface-variant">솔로</span>
                 <span className={`font-black ${getTierColor(player.soloRank.tier)}`}>
                   {getTierKoreanName(player.soloRank.tier)}{' '}
@@ -148,7 +150,7 @@ function PlayerCard({ player }: { player: Player }) {
               </div>
             )}
             {player.flexRank && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-bold text-on-surface-variant">자유</span>
                 <span className={`font-black ${getTierColor(player.flexRank.tier)}`}>
                   {getTierKoreanName(player.flexRank.tier)}{' '}
@@ -290,7 +292,7 @@ export default function ResultPage() {
     <div className="min-h-screen flex flex-col bg-surface">
       <Navigation />
 
-      <main className="flex-grow pt-32 pb-20 px-6 max-w-screen-xl mx-auto w-full">
+      <main className="flex-grow w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(4rem+env(safe-area-inset-bottom,0px))]">
         <Suspense
           fallback={
             <div className="flex items-center justify-center min-h-[400px]">
