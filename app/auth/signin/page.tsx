@@ -13,10 +13,10 @@ export default function SignInPage() {
     <div className="min-h-screen flex flex-col bg-surface">
       <Navigation />
       
-      <main className="flex-grow flex items-center justify-center px-6 pt-32 pb-20">
+      <main className="flex-grow flex items-center justify-center w-full px-4 sm:px-6 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(4rem+env(safe-area-inset-bottom,0px))]">
         <div className="w-full max-w-md">
-          <div className="bg-surface-container-lowest p-10 rounded-[3rem] no-line-boundary text-center">
-            <h1 className="text-4xl font-black tracking-tight text-on-surface mb-4">
+          <div className="bg-surface-container-lowest p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] no-line-boundary text-center">
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-on-surface mb-4">
               로그인
             </h1>
             <p className="text-on-surface-variant mb-8">
@@ -24,8 +24,9 @@ export default function SignInPage() {
             </p>
             
             <button
+              type="button"
               onClick={handleGoogleSignIn}
-              className="w-full px-10 py-5 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-full font-extrabold text-lg shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
+              className="w-full min-h-[3.25rem] px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-full font-extrabold text-base sm:text-lg shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
             >
               <svg className="w-6 h-6" viewBox="0 0 24 24">
                 <path

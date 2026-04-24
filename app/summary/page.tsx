@@ -1,9 +1,12 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/src/components/Navigation';
 import { Footer } from '@/src/components/Footer';
+import { SummonerSearchPanel } from '@/src/components/SummonerSearchPanel';
+import { formatDateToInput, getToday } from '@/src/utils/date';
 import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
 import {
   useChampions,
@@ -23,12 +26,54 @@ import type { components } from '@/src/types/api.generated';
 type Player = components['schemas']['Player'];
 
 function ResultContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const summoners = searchParams.get('summoners')?.split(',') || [];
+  const summoners = searchParams.get('summoners')?.split(',').map((s) => s.trim()).filter(Boolean) || [];
   const startDate = searchParams.get('startDate') || undefined;
   const endDate = searchParams.get('endDate') || undefined;
 
+  const [editSearchOpen, setEditSearchOpen] = useState(false);
+  const [portalMounted, setPortalMounted] = useState(false);
+
+  useEffect(() => {
+    setPortalMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!editSearchOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setEditSearchOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [editSearchOpen]);
+
   const { data, isLoading, isError, error } = useBatchSummary(summoners, startDate, endDate);
+
+  const today = formatDateToInput(getToday());
+  const initialSummonerInput = summoners.join(', ');
+  const initialStart = startDate ?? today;
+  const initialEnd = endDate ?? today;
+
+  const handleApplySearch = (names: string[], s: string, e: string) => {
+    setEditSearchOpen(false);
+    if (names.length === 1) {
+      const q = new URLSearchParams({ startDate: s, endDate: e }).toString();
+      router.push(`/summoner/${encodeURIComponent(names[0])}?${q}`);
+      return;
+    }
+    const q = new URLSearchParams({
+      summoners: names.join(','),
+      startDate: s,
+      endDate: e,
+    }).toString();
+    router.push(`/summary?${q}`);
+  };
 
   if (isLoading) {
     return (
@@ -81,17 +126,75 @@ function ResultContent() {
     );
   }
 
+  const editSearchModal =
+    portalMounted &&
+    editSearchOpen &&
+    createPortal(
+      <div
+        className="fixed inset-0 z-[210] flex items-center justify-center p-3 sm:p-6 pt-[max(0.75rem,env(safe-area-inset-top,0px))] pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]"
+        role="presentation"
+      >
+        <button
+          type="button"
+          className="absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+          aria-label="검색 창 닫기"
+          onClick={() => setEditSearchOpen(false)}
+        />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="summary-edit-search-title"
+          className="relative z-[1] w-full max-w-4xl max-h-[min(92dvh,100svh)] overflow-y-auto overscroll-y-contain touch-pan-y rounded-[1.75rem] sm:rounded-[2rem] bg-surface-container-lowest p-5 sm:p-6 shadow-2xl no-line-boundary"
+        >
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <h2
+              id="summary-edit-search-title"
+              className="text-left text-lg font-black text-on-surface tracking-tight"
+            >
+              소환사·기간 다시 검색
+            </h2>
+            <button
+              type="button"
+              onClick={() => setEditSearchOpen(false)}
+              className="shrink-0 p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors"
+              aria-label="닫기"
+            >
+              <span className="material-symbols-outlined text-xl leading-none">close</span>
+            </button>
+          </div>
+          <SummonerSearchPanel
+            formIdPrefix="summary-edit"
+            showInfoText
+            initialSummonerInput={initialSummonerInput}
+            initialStartDate={initialStart}
+            initialEndDate={initialEnd}
+            onSearch={handleApplySearch}
+          />
+        </div>
+      </div>,
+      document.body,
+    );
+
   return (
     <div className="space-y-8">
-      {/* 조회 기간 표시 */}
-      <div className="bg-surface-container-lowest p-6 rounded-3xl no-line-boundary">
-        <p className="text-center text-on-surface-variant font-semibold">
-          <span className="material-symbols-outlined icon-sm align-middle mr-2">
+      {/* 조회 기간 표시 — 클릭 시 홈과 동일한 검색 UI */}
+      <button
+        type="button"
+        onClick={() => setEditSearchOpen(true)}
+        className="w-full text-left bg-surface-container-lowest p-4 sm:p-6 rounded-3xl no-line-boundary border-2 border-transparent hover:border-primary/25 active:scale-[0.99] transition-all cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-container"
+      >
+        <p className="text-center text-on-surface-variant font-semibold text-sm sm:text-base break-words leading-relaxed">
+          <span className="material-symbols-outlined icon-sm align-middle mr-2 text-primary">
             calendar_today
           </span>
           {data.periodStr}
         </p>
-      </div>
+        <p className="text-center text-primary text-xs sm:text-sm font-bold mt-2">
+          탭하여 소환사·날짜 변경
+        </p>
+      </button>
+
+      {editSearchModal}
 
       {/* 소환사 카드 목록 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -114,9 +217,9 @@ function PlayerCard({ player }: { player: Player }) {
   };
 
   return (
-    <div className="bg-surface-container-lowest p-8 rounded-3xl no-line-boundary">
+    <div className="bg-surface-container-lowest p-4 sm:p-6 lg:p-8 rounded-3xl no-line-boundary">
       {/* 헤더: 소환사 정보 */}
-      <div className="flex items-start gap-6 mb-6 pb-6 border-b border-outline-variant/20">
+      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 pb-6 border-b border-outline-variant/20">
         <div className="relative">
           <div className="w-24 h-24 rounded-2xl bg-surface-container overflow-hidden">
             <img
@@ -130,13 +233,15 @@ function PlayerCard({ player }: { player: Player }) {
           </div>
         </div>
 
-        <div className="flex-1">
-          <h2 className="text-3xl font-black text-on-surface mb-2">{player.riotId}</h2>
+        <div className="flex-1 min-w-0 w-full">
+          <h2 className="text-xl sm:text-3xl font-black text-on-surface mb-2 break-words">
+            {player.riotId}
+          </h2>
 
           {/* 랭크 정보 */}
-          <div className="flex gap-4 mb-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-2 mb-2">
             {player.soloRank && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-bold text-on-surface-variant">솔로</span>
                 <span className={`font-black ${getTierColor(player.soloRank.tier)}`}>
                   {getTierKoreanName(player.soloRank.tier)}{' '}
@@ -148,7 +253,7 @@ function PlayerCard({ player }: { player: Player }) {
               </div>
             )}
             {player.flexRank && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-bold text-on-surface-variant">자유</span>
                 <span className={`font-black ${getTierColor(player.flexRank.tier)}`}>
                   {getTierKoreanName(player.flexRank.tier)}{' '}
@@ -290,7 +395,7 @@ export default function ResultPage() {
     <div className="min-h-screen flex flex-col bg-surface">
       <Navigation />
 
-      <main className="flex-grow pt-32 pb-20 px-6 max-w-screen-xl mx-auto w-full">
+      <main className="flex-grow w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(4rem+env(safe-area-inset-bottom,0px))]">
         <Suspense
           fallback={
             <div className="flex items-center justify-center min-h-[400px]">

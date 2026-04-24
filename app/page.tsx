@@ -63,9 +63,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-surface">
-      <Navigation currentPage="home" isHomePage />
+      <Navigation isHomePage />
 
-      <main className="flex-grow pt-32 pb-20 px-6 max-w-screen-2xl mx-auto w-full">
+      <main className="flex-grow w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(4rem+env(safe-area-inset-bottom,0px))]">
         <HeroSection onSearch={handleSearch} />
         <LeaderboardSection players={mockLeaderboard} />
       </main>

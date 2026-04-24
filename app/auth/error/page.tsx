@@ -14,16 +14,16 @@ function ErrorContent() {
     <div className="min-h-screen flex flex-col bg-surface">
       <Navigation />
       
-      <main className="flex-grow flex items-center justify-center px-6 pt-32 pb-20">
+      <main className="flex-grow flex items-center justify-center w-full px-4 sm:px-6 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(4rem+env(safe-area-inset-bottom,0px))]">
         <div className="w-full max-w-md">
-          <div className="bg-surface-container-lowest p-10 rounded-[3rem] no-line-boundary text-center">
+          <div className="bg-surface-container-lowest p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] no-line-boundary text-center">
             <div className="w-16 h-16 rounded-full bg-error-container flex items-center justify-center mx-auto mb-6">
               <span className="material-symbols-outlined text-error text-3xl">
                 error
               </span>
             </div>
             
-            <h1 className="text-3xl font-black tracking-tight text-on-surface mb-4">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-on-surface mb-4">
               로그인 실패
             </h1>
             
@@ -42,7 +42,7 @@ function ErrorContent() {
             
             <Link
               href="/auth/signin"
-              className="inline-block px-10 py-5 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-full font-extrabold text-lg shadow-lg hover:scale-105 active:scale-95 transition-all"
+              className="inline-flex min-h-[3.25rem] items-center justify-center px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-full font-extrabold text-base sm:text-lg shadow-lg hover:scale-105 active:scale-95 transition-all"
             >
               다시 시도
             </Link>
@@ -60,7 +60,7 @@ export default function AuthErrorPage() {
     <Suspense fallback={
       <div className="min-h-screen flex flex-col bg-surface">
         <Navigation />
-        <main className="flex-grow flex items-center justify-center">
+        <main className="flex-grow flex items-center justify-center px-4 pt-[calc(4.5rem+env(safe-area-inset-top,0px))]">
           <div className="animate-pulse text-on-surface-variant">로딩 중...</div>
         </main>
         <Footer />
