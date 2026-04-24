@@ -26,10 +26,20 @@ export function getDaysDifference(startDate: Date, endDate: Date): number {
 /**
  * 날짜 범위 검증 (최대 7일)
  */
-export function isValidDateRange(startDate: Date, endDate: Date): {
+export function isValidDateRange(
+  startDate: Date,
+  endDate: Date,
+): {
   valid: boolean;
   error?: string;
 } {
+  const todayStr = formatDateToInput(getToday());
+  const startStr = formatDateToInput(startDate);
+  const endStr = formatDateToInput(endDate);
+  if (startStr > todayStr || endStr > todayStr) {
+    return { valid: false, error: '오늘 이후 날짜는 선택할 수 없습니다.' };
+  }
+
   if (startDate > endDate) {
     return { valid: false, error: '시작일은 종료일보다 이전이어야 합니다.' };
   }
