@@ -191,13 +191,12 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
             aria-expanded={showDatePicker}
             aria-haspopup="dialog"
             aria-controls="hero-date-range-dialog"
-            className="min-h-[3.25rem] flex items-center justify-center gap-2 px-4 sm:px-5 md:px-6 py-4 sm:py-6 bg-surface-container hover:bg-surface-container-high transition-colors rounded-full text-on-surface-variant font-bold whitespace-nowrap shrink-0 min-w-0 active:scale-[0.98]"
+            className="min-h-[3.25rem] w-full md:w-auto flex items-center gap-2 px-4 sm:px-5 md:px-6 py-4 sm:py-6 bg-surface-container hover:bg-surface-container-high transition-colors rounded-full text-on-surface-variant font-bold min-w-0 active:scale-[0.98]"
           >
             <span className="material-symbols-outlined shrink-0 text-xl">calendar_today</span>
-            <span className="hidden sm:inline truncate max-w-[150px] md:max-w-none text-base md:text-lg">
+            <span className="min-w-0 flex-1 md:flex-initial truncate text-left text-sm sm:text-base md:text-lg">
               {getDateRangeText()}
             </span>
-            <span className="sm:hidden text-sm">날짜</span>
             <span
               className={`material-symbols-outlined text-lg shrink-0 transition-transform ${showDatePicker ? 'rotate-180' : ''}`}
             >
