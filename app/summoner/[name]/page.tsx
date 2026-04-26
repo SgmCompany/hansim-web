@@ -7,10 +7,14 @@ import { Navigation } from '../../../src/components/Navigation';
 import { Footer } from '../../../src/components/Footer';
 import { SummonerProfile } from '@/src/components/SummonerProfile';
 import { StatsGrid } from '@/src/components/StatsGrid';
+import { MultiKillsCard } from '@/src/components/MultiKillsDisplay';
+import { TopChampionsStrip } from '@/src/components/TopChampionsStrip';
 import { SummonerSearchPanel } from '@/src/components/SummonerSearchPanel';
 import { formatDateToInput, getToday } from '@/src/utils/date';
 import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
 import { getProfileIconUrl, useLatestVersion, getTierKoreanName, getRankKoreanName, getTierColor } from '@/src/lib/ddragon';
+import { getPrimaryQueue } from '@/src/utils/queue';
+import { summarizeLaneFromChampions } from '@/src/utils/lanePreference';
 
 type PageProps = {
   params: Promise<{ name: string }>;
@@ -119,6 +123,13 @@ function SummonerContent({ name }: { name: string }) {
   }
 
   const player = data.players[0];
+  const primaryQueue = getPrimaryQueue(player.queues);
+  const lanePreference = summarizeLaneFromChampions(player.topChampions);
+  const safeFloat = (s: string | undefined, fallback = 0) => {
+    if (s == null || s === '') return fallback;
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : fallback;
+  };
 
   const editSearchModal =
     portalMounted &&
@@ -145,7 +156,7 @@ function SummonerContent({ name }: { name: string }) {
               id="summoner-detail-edit-search-title"
               className="text-left text-lg font-black text-on-surface tracking-tight"
             >
-              소환사·기간 다시 검색
+              검색 변경
             </h2>
             <button
               type="button"
@@ -190,43 +201,75 @@ function SummonerContent({ name }: { name: string }) {
       lp: player.flexRank.lp,
     } : undefined,
     streak: player.streak,
-    // StatsGrid용
-    winRate: player.queues.solo ? parseFloat(player.queues.solo.winRate) : 0,
-    wins: player.queues.solo?.win || 0,
-    losses: player.queues.solo?.lose || 0,
-    kda: player.queues.solo?.kda || '0.0',
-    kdaDetail: '0 / 0 / 0', // TODO: 백엔드에서 제공 시 업데이트
-    killParticipation: 0, // TODO: 백엔드에서 제공 시 업데이트
-    csPerMin: 0, // TODO: 백엔드에서 제공 시 업데이트
-    avgCs: 0, // TODO: 백엔드에서 제공 시 업데이트
-    visionScore: 0, // TODO: 백엔드에서 제공 시 업데이트
-    wardsPerMin: 0, // TODO: 백엔드에서 제공 시 업데이트
-    controlWards: 0, // TODO: 백엔드에서 제공 시 업데이트
+    // StatsGrid용 (솔로 → 자유 → 일반 중 전적이 있는 대표 큐)
+    winRate: primaryQueue ? safeFloat(primaryQueue.winRate) : 0,
+    wins: primaryQueue?.win ?? 0,
+    losses: primaryQueue?.lose ?? 0,
+    kda: primaryQueue?.kda ?? '0.0',
+    kdaDetail: null,
+    killParticipation: null,
+    csPerMin: primaryQueue ? safeFloat(primaryQueue.avgCsPerMin) : 0,
+    visionScore: primaryQueue ? safeFloat(primaryQueue.avgVisionScore) : 0,
+    avgDamage: primaryQueue?.avgDamage ?? 0,
   };
 
   return (
-    <>
+    <div
+      data-layout="summoner-compact"
+      data-emphasis="subtle"
+      className="flex flex-col gap-4 sm:gap-5 w-full min-w-0 overflow-x-clip"
+    >
       <button
         type="button"
         onClick={() => setEditSearchOpen(true)}
-        className="w-full text-left mb-6 bg-surface-container-lowest p-4 sm:p-6 rounded-3xl no-line-boundary border-2 border-transparent hover:border-primary/25 active:scale-[0.99] transition-all cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-container"
+        className="w-full text-left bg-surface-container-lowest px-3 py-2.5 sm:px-5 sm:py-3.5 rounded-2xl sm:rounded-3xl no-line-boundary border-2 border-transparent hover:border-primary/25 active:scale-[0.99] transition-all cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-container"
       >
-        <p className="text-center text-on-surface-variant font-semibold text-sm sm:text-base break-words leading-relaxed">
-          <span className="material-symbols-outlined icon-sm align-middle mr-2 text-primary">
-            calendar_today
-          </span>
-          {data.periodStr}
-        </p>
-        <p className="text-center text-primary text-xs sm:text-sm font-bold mt-2">
-          탭하여 소환사·날짜 변경
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-0.5 sm:gap-2 text-center">
+          <p className="text-on-surface-variant font-semibold text-xs sm:text-sm wrap-break-word leading-snug inline-flex flex-wrap items-center justify-center gap-1.5">
+            <span className="material-symbols-outlined icon-sm text-primary shrink-0" aria-hidden>
+              calendar_today
+            </span>
+            {data.periodStr}
+          </p>
+          <p className="text-primary text-[0.7rem] sm:text-xs font-bold sm:shrink-0">검색·기간 변경</p>
+        </div>
       </button>
 
       {editSearchModal}
 
-      <SummonerProfile summoner={summonerData} />
-      <StatsGrid stats={summonerData} />
-    </>
+      {/*
+        모바일: 프로필 → 멀티킬 → 챔피언 → 통계 (order-1~4)
+        lg+: 왼쪽 프로필·멀티킬 / 오른쪽 통계 2행 병합, 그 아래 챔피언 전체 너비
+      */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 lg:gap-6 lg:items-stretch">
+        {/*
+          모바일: 프로필+멀티킬을 한 세로 블록으로 묶음 / lg+: display:contents로 그리드 자식 유지
+        */}
+        <div className="order-1 flex flex-col gap-4 min-w-0 lg:contents">
+          <SummonerProfile
+            summoner={summonerData}
+            lanePreference={lanePreference}
+            className="mb-0 min-w-0 lg:col-span-5 lg:row-start-1 lg:self-start"
+          />
+          {primaryQueue && (
+            <MultiKillsCard
+              multiKills={primaryQueue.multiKills}
+              hideWhenEmpty
+              subtitle="솔·자유·일반 중 전적 있는 큐"
+              className="mb-0 min-w-0 lg:col-span-5 lg:row-start-2 lg:self-start"
+            />
+          )}
+        </div>
+        <TopChampionsStrip
+          champions={player.topChampions ?? []}
+          surface="page"
+          className="order-3 min-w-0 lg:order-none lg:col-span-12 lg:row-start-3"
+        />
+        <div className="order-4 min-w-0 lg:order-none lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1">
+          <StatsGrid layout="compact" stats={summonerData} />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -237,7 +280,7 @@ export default function SummonerDetailPage({ params }: PageProps) {
     <div className="min-h-screen flex flex-col bg-surface">
       <Navigation />
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(4rem+env(safe-area-inset-bottom,0px))]">
+      <main className="flex-1 w-full max-w-7xl mx-auto pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8 pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(5.5rem+env(safe-area-inset-top,0px))] pb-[max(2.5rem,env(safe-area-inset-bottom,0px))] sm:pb-[max(4rem,env(safe-area-inset-bottom,0px))]">
         <Suspense
           fallback={
             <div className="flex items-center justify-center min-h-[400px]">

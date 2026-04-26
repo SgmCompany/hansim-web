@@ -100,3 +100,151 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/*
+ * Prototype: summoner-detail.html — TweaksPanel compact preset
+ * (--card-roundness: 12px, --stat-density: 0.7, data-emphasis="subtle")
+ */
+[data-layout='summoner-compact'] {
+  --card-roundness: 12px;
+  /* 패딩·간격: 너무 낮으면 통계 카드·멀티킬 영역 텍스트가 밀림 */
+  --stat-density: 0.88;
+}
+
+[data-layout='summoner-compact'] > button:first-of-type,
+[data-layout='summoner-compact'] header {
+  border-radius: var(--card-roundness);
+}
+
+/* .stats-grid — repeat(auto-fit, minmax(200px, 1fr)) */
+[data-layout='summoner-compact'] .summoner-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13.75rem, 1fr));
+  gap: calc(1rem * var(--stat-density));
+  margin-bottom: calc(1.25rem * var(--stat-density));
+}
+
+/* 모바일·태블릿: 세로 1열 대신 2열로 스크롤 길이 완화 */
+@media (max-width: 1023px) {
+  [data-layout='summoner-compact'] .summoner-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-layout='summoner-compact'] .summoner-stat-card {
+  border-radius: var(--card-roundness);
+  box-shadow: 0 4px 60px -15px rgba(0, 0, 0, 0.05);
+  padding: calc(1.25rem * var(--stat-density));
+  /* density로만 줄이면 카드가 과도하게 낮아져 숫자·라벨이 겹침 */
+  min-height: max(10.25rem, calc(9.5rem * var(--stat-density)));
+}
+
+[data-layout='summoner-compact'] .summoner-stat-card .summoner-stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-on-surface-variant);
+  margin-bottom: calc(0.75rem * var(--stat-density));
+}
+
+[data-layout='summoner-compact'] .summoner-stat-card .summoner-stat-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+[data-layout='summoner-compact'][data-emphasis='subtle'] .summoner-stat-card .summoner-stat-value {
+  font-size: 2.125rem;
+  font-weight: 700;
+}
+
+[data-layout='summoner-compact'] .summoner-stat-card .summoner-winrate-percent {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+[data-layout='summoner-compact'] .summoner-stat-card .summoner-stat-sub,
+[data-layout='summoner-compact'] .summoner-stat-card .summoner-stat-meta {
+  font-size: 0.75rem;
+}
+
+[data-layout='summoner-compact'] .summoner-stat-donut {
+  width: 9rem;
+  height: 9rem;
+  max-width: 100%;
+}
+
+[data-layout='summoner-compact'][data-emphasis='subtle'] .summoner-stat-donut {
+  width: calc(9rem * (0.78 + var(--stat-density) * 0.22));
+  height: calc(9rem * (0.78 + var(--stat-density) * 0.22));
+}
+
+[data-layout='summoner-compact'] .summoner-stat-icon-wrap {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+[data-layout='summoner-compact'] .summoner-stat-icon-wrap .material-symbols-outlined {
+  font-size: 1.25rem !important;
+}
+
+/* .stat-icon.error — 아이콘 색은 error 토큰 */
+[data-layout='summoner-compact'] .summoner-stat-icon-error {
+  color: var(--color-error);
+}
+
+[data-layout='summoner-compact'] [aria-label='멀티킬'] {
+  border-radius: var(--card-roundness);
+  box-shadow: 0 4px 60px -15px rgba(0, 0, 0, 0.05);
+  padding: calc(1.25rem * var(--stat-density));
+}
+
+/*
+ * Prototype: summary-multi.html — .players-grid, --card-gap
+ */
+.summary-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr));
+  gap: var(--summary-card-gap, 1.5rem);
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .summary-comparison-grid {
+    gap: 1.75rem;
+  }
+}
+
+/* 모바일: 카드 간격 */
+@media (max-width: 639px) {
+  .summary-comparison-grid {
+    gap: 1rem;
+  }
+}
+
+.summary-touch-scroll-x {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-gutter: stable;
+}
+
+[data-comparison-layout='stacked'] .summary-comparison-grid {
+  grid-template-columns: 1fr;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+[data-comparison-layout='wide'] .summary-comparison-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 767px) {
+  .summary-comparison-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

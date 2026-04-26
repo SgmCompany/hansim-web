@@ -1,4 +1,5 @@
 type StatsGridProps = {
+  layout?: 'default' | 'compact';
   stats: {
     winRate: number;
     wins: number;
@@ -7,26 +8,101 @@ type StatsGridProps = {
     lp: number;
     winStreak: number;
     kda: string;
-    kdaDetail: string;
-    killParticipation: number;
+    kdaDetail?: string | null;
+    killParticipation?: number | null;
     csPerMin: number;
-    avgCs: number;
     visionScore: number;
-    wardsPerMin: number;
-    controlWards: number;
+    avgDamage: number;
   };
 };
 
-export function StatsGrid({ stats }: StatsGridProps) {
+function formatDamage(n: number): string {
+  return new Intl.NumberFormat('ko-KR').format(Math.round(n));
+}
+
+export function StatsGrid({ stats, layout = 'default' }: StatsGridProps) {
+  const compact = layout === 'compact';
+  const kdaDetailText = stats.kdaDetail?.trim() ? stats.kdaDetail : '—';
+  const kpText =
+    stats.killParticipation != null && Number.isFinite(stats.killParticipation)
+      ? `${stats.killParticipation}%`
+      : '—';
+
+  const cardBase = compact
+    ? 'summoner-stat-card bg-surface-container-lowest flex flex-col shadow-sm'
+    : 'bg-surface-container-lowest rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col shadow-sm min-h-[9.5rem] sm:min-h-0';
+
+  const winCardExtra = compact
+    ? 'items-center justify-center text-center'
+    : 'items-center justify-center text-center min-h-[9.5rem] sm:min-h-0';
+
+  const titleCls = compact
+    ? 'summoner-stat-label font-bold text-on-surface-variant tracking-wide'
+    : 'text-[0.7rem] sm:text-xs font-bold text-on-surface-variant mb-3 tracking-wide';
+
+  const valueCls = compact
+    ? 'summoner-stat-value font-black text-on-surface tabular-nums leading-none'
+    : 'text-3xl sm:text-4xl font-black text-on-surface tabular-nums leading-none';
+
+  const primaryValueCls = compact
+    ? 'summoner-stat-value font-black text-primary tabular-nums leading-none'
+    : 'text-3xl sm:text-4xl font-black text-primary tabular-nums leading-none';
+
+  const subCls = compact
+    ? 'summoner-stat-sub text-on-surface-variant font-medium mt-1.5 line-clamp-2 min-h-[2.5rem]'
+    : 'text-on-surface-variant font-medium text-xs sm:text-sm mt-1.5 line-clamp-2 min-h-[2.5rem]';
+
+  const hintCls = compact
+    ? 'summoner-stat-meta text-on-surface-variant font-medium mt-2'
+    : 'text-on-surface-variant text-[0.7rem] sm:text-xs font-medium mt-2';
+
+  const wlCls = compact
+    ? 'summoner-stat-meta font-bold text-on-surface-variant mt-1 tabular-nums'
+    : 'text-[0.7rem] sm:text-xs font-bold text-on-surface-variant mt-1 tabular-nums';
+
+  const metaRowLabel = compact
+    ? 'summoner-stat-meta font-bold text-on-surface-variant shrink-0'
+    : 'text-[0.7rem] sm:text-xs font-bold text-on-surface-variant shrink-0';
+
+  const metaRowVal = compact
+    ? 'summoner-stat-meta font-black text-on-surface tabular-nums'
+    : 'text-xs sm:text-sm font-black text-on-surface tabular-nums';
+
+  const iconWrap = compact
+    ? 'summoner-stat-icon-wrap rounded-full flex items-center justify-center shrink-0'
+    : 'w-9 h-9 rounded-full flex items-center justify-center shrink-0';
+
+  const iconPrimary = compact
+    ? `${iconWrap} bg-primary-container text-primary`
+    : 'w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-primary shrink-0';
+  const iconSecondary = compact
+    ? `${iconWrap} bg-secondary-container text-secondary`
+    : 'w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center text-secondary shrink-0';
+  const iconTertiary = compact
+    ? `${iconWrap} bg-tertiary-container text-tertiary`
+    : 'w-9 h-9 rounded-full bg-tertiary-container flex items-center justify-center text-tertiary shrink-0';
+  const iconError = compact
+    ? `${iconWrap} bg-error-container summoner-stat-icon-error`
+    : 'w-9 h-9 rounded-full bg-error-container flex items-center justify-center text-on-error-container shrink-0';
+
+  const donutWrap = compact
+    ? 'summoner-stat-donut relative flex items-center justify-center shrink-0'
+    : 'relative w-[7.25rem] h-[7.25rem] sm:w-36 sm:h-36 flex items-center justify-center shrink-0';
+
+  const gridCls = compact
+    ? 'summoner-stat-grid grid'
+    : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 mb-3 sm:mb-4';
+
+  const statTitleCls = compact
+    ? 'font-black text-on-surface text-sm'
+    : 'font-black text-on-surface text-sm sm:text-base';
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
-      {/* Win Rate Circular Card */}
-      <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col items-center justify-center text-center shadow-sm h-full">
-        <h3 className="text-sm font-bold text-on-surface-variant mb-6 tracking-widest uppercase">
-          승률
-        </h3>
-        <div className="relative w-40 h-40 flex items-center justify-center">
-          <svg className="w-full h-full -rotate-90">
+    <div className={gridCls}>
+      <div className={`${cardBase} ${winCardExtra}`}>
+        <h3 className={compact ? `${titleCls} mb-1 text-center w-full` : titleCls}>승률</h3>
+        <div className={compact ? `${donutWrap} mt-2` : donutWrap}>
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160" aria-hidden>
             <circle
               className="text-surface-container-low"
               cx="80"
@@ -35,7 +111,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
               r="70"
               stroke="currentColor"
               strokeWidth="14"
-            ></circle>
+            />
             <circle
               className="text-primary"
               cx="80"
@@ -47,86 +123,80 @@ export function StatsGrid({ stats }: StatsGridProps) {
               strokeDashoffset={439.8 * (1 - stats.winRate / 100)}
               strokeLinecap="round"
               strokeWidth="14"
-            ></circle>
+            />
           </svg>
           <div className="absolute flex flex-col items-center">
-            <span className="text-4xl font-black text-on-surface">{stats.winRate}%</span>
-            <span className="text-xs font-bold text-on-surface-variant">
+            <span className={compact ? 'summoner-winrate-percent text-on-surface tabular-nums' : valueCls}>
+              {stats.winRate}%
+            </span>
+            <span className={wlCls}>
               {stats.wins}승 {stats.losses}패
             </span>
           </div>
         </div>
       </div>
-        {/* KDA Card */}
-        <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col shadow-sm h-full">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined filled">
-                swords
-              </span>
-            </div>
-            <span className="font-black text-on-surface">KDA</span>
-          </div>
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-4xl font-black text-primary">{stats.kda}</span>
-            <span className="text-on-surface-variant font-bold text-sm">평균</span>
-          </div>
-          <p className="text-on-surface-variant font-medium text-sm">{stats.kdaDetail}</p>
-          <div className="flex-1"></div>
-          <div className="mt-8 pt-6 border-t border-outline-variant/15">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-on-surface-variant">킬 관여율</span>
-              <span className="text-sm font-black text-on-surface">{stats.killParticipation}%</span>
-            </div>
-          </div>
-        </div>
 
-        {/* CS/Min Card */}
-        <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col shadow-sm h-full">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
-              <span className="material-symbols-outlined filled">
-                grass
-              </span>
-            </div>
-            <span className="font-black text-on-surface">CS/Min</span>
+      <div className={`${cardBase} min-h-[9.5rem]`}>
+        <div className="flex items-center gap-2.5 mb-2">
+          <div className={iconPrimary}>
+            <span className="material-symbols-outlined filled text-[1.25rem]">swords</span>
           </div>
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-4xl font-black text-on-surface">{stats.csPerMin}</span>
-            <span className="text-on-surface-variant font-bold text-sm">개/분</span>
-          </div>
-          <p className="text-on-surface-variant font-medium text-sm mb-2">총 CS 평균 {stats.avgCs}개</p>
-          <div className="flex-1"></div>
-          <div className="mt-8 pt-6 border-t border-outline-variant/15 opacity-0">
-            <div className="h-5"></div>
-          </div>
+          <span className={statTitleCls}>KDA</span>
         </div>
+        <div className="flex items-baseline gap-1.5">
+          <span className={primaryValueCls}>{stats.kda}</span>
+        </div>
+        <p className={subCls}>{kdaDetailText}</p>
+        <div className="flex-1 min-h-2" />
+        <div className="pt-3 mt-auto border-t border-outline-variant/15 flex justify-between items-center gap-2">
+          <span className={metaRowLabel}>킬관여</span>
+          <span className={metaRowVal}>{kpText}</span>
+        </div>
+      </div>
 
-        {/* Vision Score Card */}
-        <div className="bg-surface-container-lowest rounded-xl p-5 sm:p-8 flex flex-col shadow-sm h-full">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-tertiary">
-              <span className="material-symbols-outlined filled">
-                visibility
-              </span>
-            </div>
-            <span className="font-black text-on-surface">시야 점수</span>
+      <div className={`${cardBase} min-h-[9.5rem]`}>
+        <div className="flex items-center gap-2.5 mb-2">
+          <div className={iconSecondary}>
+            <span className="material-symbols-outlined filled text-[1.25rem]">grass</span>
           </div>
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-4xl font-black text-on-surface">{stats.visionScore}</span>
-            <span className="text-on-surface-variant font-bold text-sm">점</span>
-          </div>
-          <p className="text-on-surface-variant font-medium text-sm">
-            분당 와드 설치 {stats.wardsPerMin}개
-          </p>
-          <div className="flex-1"></div>
-          <div className="mt-8 pt-6 border-t border-outline-variant/15">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-on-surface-variant">제어 와드 구매</span>
-              <span className="text-sm font-black text-on-surface">평균 {stats.controlWards}개</span>
-            </div>
-          </div>
+          <span className={statTitleCls}>CS/분</span>
         </div>
+        <div className="flex items-baseline gap-1">
+          <span className={valueCls}>{stats.csPerMin.toFixed(1)}</span>
+        </div>
+        <p className={hintCls}>대표 큐·분당</p>
+        <div className="flex-1" />
+      </div>
+
+      <div className={`${cardBase} min-h-[9.5rem]`}>
+        <div className="flex items-center gap-2.5 mb-2">
+          <div className={iconTertiary}>
+            <span className="material-symbols-outlined filled text-[1.25rem]">visibility</span>
+          </div>
+          <span className={statTitleCls}>시야</span>
+        </div>
+        <div className="flex items-baseline gap-1">
+          <span className={valueCls}>{stats.visionScore.toFixed(1)}</span>
+        </div>
+        <p className={hintCls}>평균 비전</p>
+        <div className="flex-1" />
+      </div>
+
+      <div
+        className={`${cardBase} min-h-[9.5rem]${compact ? '' : ' sm:col-span-2 lg:col-span-1 xl:col-span-1'}`}
+      >
+        <div className="flex items-center gap-2.5 mb-2">
+          <div className={iconError}>
+            <span className="material-symbols-outlined filled text-[1.25rem]">whatshot</span>
+          </div>
+          <span className={statTitleCls}>딜</span>
+        </div>
+        <div className="flex items-baseline gap-1">
+          <span className={`${valueCls} break-all`}>{formatDamage(stats.avgDamage)}</span>
+        </div>
+        <p className={hintCls}>평균 피해량/판</p>
+        <div className="flex-1" />
+      </div>
     </div>
   );
 }
