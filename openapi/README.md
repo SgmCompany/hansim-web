@@ -1,5 +1,20 @@
 # OpenAPI 스펙 자동화
 
+## 정책
+
+1. **단일 소스는 `openapi/openapi.json`입니다.**  
+   백엔드 스펙이 바뀌면 이 파일을 갱신한 뒤 `npm run generate:api`로 타입을 다시 냅니다.
+
+2. **`src/types/api.generated.ts`는 Git에 포함합니다.**  
+   클론만으로 `next build`(Vercel 등)가 통과하고, PR에서 API 변경이 타입 diff로도 보입니다.
+
+3. **운영 빌드·런타임에는 타입 생성기가 없습니다.**  
+   `build` 스크립트는 `next build`만 실행합니다. `openapi-typescript`는 개발 의존성으로 로컬/PR에서만 사용합니다.
+
+스펙과 타입을 같이 올릴 때: `openapi.json` 수정 → `npm run generate:api` → 두 파일을 한 커밋(또는 같은 PR)에 넣는 것을 권장합니다.
+
+---
+
 ## 사용 방법
 
 ### 1. 백엔드에서 스펙 생성 (hansim-api)
@@ -10,6 +25,7 @@ cd ../hansim-api
 ```
 
 이 명령어가 자동으로:
+
 1. Spring Boot 애플리케이션 실행
 2. `http://localhost:8080/v3/api-docs` 호출
 3. `hansim-web/openapi/openapi.json` 파일 생성
@@ -22,6 +38,7 @@ npm run generate:api
 ```
 
 이 명령어가:
+
 - `openapi/openapi.json` → `src/types/api.generated.ts` 변환
 - TypeScript 타입 자동 생성
 
@@ -32,6 +49,7 @@ npm run sync:api
 ```
 
 이 명령어가:
+
 1. 백엔드에서 최신 스펙 다운로드
 2. TypeScript 타입 자동 생성
 
@@ -64,7 +82,8 @@ const data: AuthResponse = await response.json();
 1. 백엔드 코드 수정
 2. `./gradlew generateOpenApiDocs` 실행
 3. 프론트엔드에서 `npm run generate:api` 실행
-4. 타입 에러 확인 → 프론트엔드 코드 수정
+4. `openapi/openapi.json`과 `src/types/api.generated.ts`를 같이 커밋
+5. 타입 에러 확인 → 프론트엔드 코드 수정
 
 ### 개발 중
 
@@ -81,13 +100,8 @@ npm run sync:api
 ```
 hansim-web/
 ├── openapi/
-│   ├── openapi.json          # 백엔드에서 생성 (git 커밋 O)
+│   ├── openapi.json          # git 커밋 O (스펙 단일 소스)
 │   └── README.md             # 이 파일
 └── src/types/
-    └── api.generated.ts      # 자동 생성 (git 커밋 X)
+    └── api.generated.ts      # generate:api 결과, git 커밋 O
 ```
-
-## .gitignore 설정
-
-- `openapi/openapi.json` - **커밋 O** (팀원이 바로 타입 생성 가능)
-- `src/types/api.generated.ts` - **커밋 X** (자동 생성 파일)

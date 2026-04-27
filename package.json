@@ -6,6 +6,7 @@
     "predev": "node scripts/sync-api-spec.js",
     "dev": "next dev -p 3000",
     "build": "next build",
+    "build:local": "npm run generate:api && next build",
     "start": "next start -p 3000",
     "lint": "eslint",
     "generate:api": "openapi-typescript openapi/openapi.json -o src/types/api.generated.ts",
