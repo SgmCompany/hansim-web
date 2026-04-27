@@ -1,4 +1,9 @@
+import type { LanePreferenceSummary } from '@/src/utils/lanePreference';
+import { LanePreferenceBlurb } from '@/src/components/LanePreferenceBlurb';
+
 type SummonerProfileProps = {
+  className?: string;
+  lanePreference?: LanePreferenceSummary | null;
   summoner: {
     name: string;
     level: number;
@@ -26,7 +31,11 @@ type SummonerProfileProps = {
   };
 };
 
-export function SummonerProfile({ summoner }: SummonerProfileProps) {
+export function SummonerProfile({
+  summoner,
+  lanePreference,
+  className = 'mb-4 sm:mb-5',
+}: SummonerProfileProps) {
   const getStreakText = () => {
     if (!summoner.streak || summoner.streak.type === 'NONE') return null;
     const type = summoner.streak.type === 'WIN' ? '연승' : '연패';
@@ -34,10 +43,12 @@ export function SummonerProfile({ summoner }: SummonerProfileProps) {
   };
 
   return (
-    <header className="bg-surface-container-lowest p-4 sm:p-6 lg:p-8 rounded-3xl no-line-boundary mb-6">
+    <header
+      className={`bg-surface-container-lowest p-4 sm:p-6 rounded-2xl sm:rounded-3xl no-line-boundary ${className}`.trim()}
+    >
       <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-        <div className="relative">
-          <div className="w-24 h-24 rounded-2xl bg-surface-container overflow-hidden">
+        <div className="relative shrink-0">
+          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-surface-container overflow-hidden">
             <img
               src={summoner.avatarUrl}
               alt={`${summoner.name} avatar`}
@@ -50,7 +61,7 @@ export function SummonerProfile({ summoner }: SummonerProfileProps) {
         </div>
 
         <div className="flex-1 min-w-0 w-full">
-          <h1 className="text-xl sm:text-3xl font-black text-on-surface mb-2 break-words">
+          <h1 className="text-lg sm:text-2xl font-black text-on-surface mb-1.5 wrap-break-word leading-tight">
             {summoner.name}
           </h1>
 
@@ -79,6 +90,8 @@ export function SummonerProfile({ summoner }: SummonerProfileProps) {
               </div>
             )}
           </div>
+
+          <LanePreferenceBlurb summary={lanePreference} />
 
           {/* 스트릭 */}
           {getStreakText() && (
