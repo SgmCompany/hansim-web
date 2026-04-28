@@ -2,6 +2,7 @@ import { useQuery, useQueries, UseQueryResult } from '@tanstack/react-query';
 import { getSummary, getBatchSummary } from '../services/summaryService';
 import { summonerKeys } from '../queryKeys';
 import type { components } from '@/src/types/api.generated';
+import { MAX_BATCH_SUMMONER_COUNT } from '@/src/constants/batchSummary';
 import { dedupeSummonerRiotIds } from '@/src/utils/riotId';
 
 type SummaryResponse = components['schemas']['SummaryResponse'];
@@ -11,7 +12,7 @@ type BatchSummaryResponse = components['schemas']['BatchSummaryResponse'];
 
 /**
  * 다중 소환사 한심 summary 조회 (Batch API 사용)
- * @param riotIds Riot ID 배열 (페이커#KR1 또는 페이커-KR1 형식)
+ * @param riotIds Riot ID 배열 (페이커#KR1 또는 페이커-KR1 형식, 최대 10명)
  * @param startDate 조회 시작일 (yyyy-MM-dd)
  * @param endDate 조회 종료일 (yyyy-MM-dd)
  */
@@ -26,7 +27,7 @@ export function useBatchSummary(riotIds: string[], startDate?: string, endDate?:
   return useQuery({
     queryKey: summonerKeys.batchSummary(uniqueIds, startDate, endDate),
     queryFn: () => getBatchSummary(request),
-    enabled: uniqueIds.length > 0 && uniqueIds.length <= 5,
+    enabled: uniqueIds.length > 0 && uniqueIds.length <= MAX_BATCH_SUMMONER_COUNT,
     staleTime: 5 * 60 * 1000, // 5분 캐싱
     gcTime: 10 * 60 * 1000, // 10분 가비지 컬렉션
   });
