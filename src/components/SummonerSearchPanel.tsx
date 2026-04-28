@@ -1,14 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { formatDateToInput, getToday, isValidDateRange } from '@/src/utils/date';
 import { DEFAULT_RIOT_TAGLINE, normalizeSummonerSearchInput } from '@/src/utils/riotId';
 import { useRecentSummoners } from '@/src/hooks/useRecentSummoners';
+import {
+  applySummonerSuggestionToInput,
+  getActiveSummonerSearchToken,
+  suggestRecentsForToken,
+} from '@/src/utils/recentSummoners';
 import { DateRangePicker } from './DateRangePicker';
 
-export const SUMMONER_SEARCH_INFO =
-  `소환사명·기간(최대 7일)으로 검색합니다. 닉네임만 쓰면 자동으로 #${DEFAULT_RIOT_TAGLINE}이 붙습니다. 여러 명은 쉼표(,)로 구분 — 예: 페이커, 쇼메이커 또는 페이커#KR1`;
+export const SUMMONER_SEARCH_INFO = `소환사명·기간(최대 7일)으로 검색합니다. 닉네임만 쓰면 자동으로 #${DEFAULT_RIOT_TAGLINE}이 붙습니다. 여러 명은 쉼표(,)로 구분 — 예: 페이커, 쇼메이커 또는 페이커#KR1`;
 
 export type SummonerSearchPanelProps = {
   onSearch: (summonerNames: string[], startDate: string, endDate: string) => void;
@@ -35,13 +39,33 @@ export function SummonerSearchPanel({
   className = '',
 }: SummonerSearchPanelProps) {
   const today = formatDateToInput(getToday());
-  const { items: recentItems, record: recordRecent, remove: removeRecent, ready: recentReady } =
-    useRecentSummoners();
+  const {
+    items: recentItems,
+    record: recordRecent,
+    remove: removeRecent,
+    ready: recentReady,
+  } = useRecentSummoners();
   const [searchInput, setSearchInput] = useState(initialSummonerInput);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [startDate, setStartDate] = useState(initialStartDate ?? today);
   const [endDate, setEndDate] = useState(initialEndDate ?? today);
   const [dateError, setDateError] = useState('');
+  const [inputFocused, setInputFocused] = useState(false);
+  const [suggestHighlight, setSuggestHighlight] = useState(-1);
+
+  const activeToken = getActiveSummonerSearchToken(searchInput);
+  const suggestions = useMemo(() => {
+    if (!recentReady || recentItems.length === 0) return [];
+    return suggestRecentsForToken(recentItems, activeToken, 6);
+  }, [recentReady, recentItems, activeToken]);
+
+  const showSuggestionList = inputFocused && suggestions.length > 0;
+  const suggestionListId = `${formIdPrefix}-suggestions`;
+  const summonerInputId = `${formIdPrefix}-summoner-input`;
+
+  useEffect(() => {
+    setSuggestHighlight(-1);
+  }, [activeToken, suggestions.length]);
 
   useEffect(() => {
     setSearchInput(initialSummonerInput);
@@ -83,7 +107,39 @@ export function SummonerSearchPanel({
     runSearch([riotId]);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const applySuggestion = (riotId: string) => {
+    setSearchInput(applySummonerSuggestionToInput(searchInput, riotId));
+    setSuggestHighlight(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      if (showSuggestionList) {
+        e.preventDefault();
+        setInputFocused(false);
+        setSuggestHighlight(-1);
+      }
+      return;
+    }
+
+    if (showSuggestionList && suggestions.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSuggestHighlight((h) => (h + 1) % suggestions.length);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSuggestHighlight((h) => (h <= 0 ? suggestions.length - 1 : h - 1));
+        return;
+      }
+      if (e.key === 'Enter' && suggestHighlight >= 0 && suggestions[suggestHighlight]) {
+        e.preventDefault();
+        applySuggestion(suggestions[suggestHighlight]);
+        return;
+      }
+    }
+
     if (e.key === 'Enter') {
       handleSearch();
     }
@@ -198,18 +254,67 @@ export function SummonerSearchPanel({
   return (
     <div className={`w-full min-w-0 ${className}`}>
       <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-2xl sm:rounded-3xl no-line-boundary flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch">
-        <div className="flex-grow relative w-full min-w-0">
-          <span className="material-symbols-outlined absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 text-outline text-xl sm:text-2xl pointer-events-none">
+        <div className="flex-grow relative w-full min-w-0 z-10">
+          <span className="material-symbols-outlined absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-outline text-xl sm:text-2xl pointer-events-none z-10">
             search
           </span>
           <input
+            id={summonerInputId}
             type="text"
+            role="combobox"
+            aria-haspopup="listbox"
+            aria-autocomplete="list"
+            aria-expanded={showSuggestionList}
+            aria-controls={suggestionListId}
+            aria-activedescendant={
+              showSuggestionList && suggestHighlight >= 0
+                ? `${suggestionListId}-opt-${suggestHighlight}`
+                : undefined
+            }
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => {
+              window.setTimeout(() => setInputFocused(false), 160);
+            }}
             placeholder={`닉네임 또는 닉네임#태그 (미입력 시 #${DEFAULT_RIOT_TAGLINE})`}
-            className="w-full pl-14 sm:pl-16 pr-4 sm:pr-6 py-4 sm:py-6 bg-surface-container rounded-full border-none focus:ring-4 focus:ring-primary-container text-base sm:text-lg md:text-xl font-semibold placeholder:text-outline-variant outline-none min-w-0"
+            className="relative z-10 w-full pl-11 sm:pl-6 pr-4 sm:pr-6 py-4 sm:py-6 bg-surface-container rounded-full border-none focus:ring-4 focus:ring-primary-container text-base sm:text-lg md:text-xl font-semibold placeholder:text-outline-variant outline-none min-w-0"
           />
+          {showSuggestionList && (
+            <ul
+              id={suggestionListId}
+              role="listbox"
+              aria-label="최근 검색에서 추천"
+              className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-20 max-h-56 overflow-y-auto rounded-2xl sm:rounded-3xl bg-surface-container-lowest py-2 shadow-xl no-line-boundary ring-1 ring-outline-variant/15"
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              {suggestions.map((riotId, i) => (
+                <li key={riotId} role="presentation">
+                  <button
+                    type="button"
+                    id={`${suggestionListId}-opt-${i}`}
+                    role="option"
+                    aria-selected={i === suggestHighlight}
+                    className={`flex w-full min-w-0 items-center gap-2 px-4 py-3 text-left text-sm sm:text-base font-bold transition-colors ${
+                      i === suggestHighlight
+                        ? 'bg-primary-container/50 text-primary'
+                        : 'text-on-surface hover:bg-surface-container'
+                    }`}
+                    onClick={() => applySuggestion(riotId)}
+                  >
+                    <span
+                      className="material-symbols-outlined text-lg text-primary shrink-0"
+                      aria-hidden
+                    >
+                      history
+                    </span>
+                    <span className="min-w-0 truncate">{riotId}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <button
