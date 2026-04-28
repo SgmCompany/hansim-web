@@ -20,13 +20,19 @@ import { MultiKillsInline } from '@/src/components/MultiKillsDisplay';
 import { TopChampionsStrip } from '@/src/components/TopChampionsStrip';
 import { LanePreferenceBlurb } from '@/src/components/LanePreferenceBlurb';
 import { summarizeLaneFromChampions } from '@/src/utils/lanePreference';
+import { normalizeSummonerSearchToken } from '@/src/utils/riotId';
 
 type Player = components['schemas']['Player'];
 
 function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const summoners = searchParams.get('summoners')?.split(',').map((s) => s.trim()).filter(Boolean) || [];
+  const summoners =
+    searchParams
+      .get('summoners')
+      ?.split(',')
+      .map((s) => normalizeSummonerSearchToken(s))
+      .filter(Boolean) || [];
   const startDate = searchParams.get('startDate') || undefined;
   const endDate = searchParams.get('endDate') || undefined;
 

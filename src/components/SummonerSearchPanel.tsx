@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { formatDateToInput, getToday, isValidDateRange } from '@/src/utils/date';
+import { DEFAULT_RIOT_TAGLINE, normalizeSummonerSearchInput } from '@/src/utils/riotId';
 import { DateRangePicker } from './DateRangePicker';
 
 export const SUMMONER_SEARCH_INFO =
-  '소환사명·기간(최대 7일)으로 검색합니다. 여러 명은 쉼표(,)로 구분 — 예: 페이커#KR1, 쇼메이커#KR1';
+  `소환사명·기간(최대 7일)으로 검색합니다. 닉네임만 쓰면 자동으로 #${DEFAULT_RIOT_TAGLINE}이 붙습니다. 여러 명은 쉼표(,)로 구분 — 예: 페이커, 쇼메이커 또는 페이커#KR1`;
 
 export type SummonerSearchPanelProps = {
   onSearch: (summonerNames: string[], startDate: string, endDate: string) => void;
@@ -49,10 +50,7 @@ export function SummonerSearchPanel({
   }, [initialEndDate]);
 
   const handleSearch = () => {
-    const names = searchInput
-      .split(',')
-      .map((name) => name.trim())
-      .filter((name) => name.length > 0);
+    const names = normalizeSummonerSearchInput(searchInput);
 
     if (names.length === 0) {
       alert('소환사명을 입력해주세요.');
@@ -193,7 +191,7 @@ export function SummonerSearchPanel({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="소환사명#태그, 소환사명#태그..."
+            placeholder={`닉네임 또는 닉네임#태그 (미입력 시 #${DEFAULT_RIOT_TAGLINE})`}
             className="w-full pl-14 sm:pl-16 pr-4 sm:pr-6 py-4 sm:py-6 bg-surface-container rounded-full border-none focus:ring-4 focus:ring-primary-container text-base sm:text-lg md:text-xl font-semibold placeholder:text-outline-variant outline-none min-w-0"
           />
         </div>
