@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { formatDateToInput, getToday, isValidDateRange } from '@/src/utils/date';
 import { DEFAULT_RIOT_TAGLINE, normalizeSummonerSearchInput } from '@/src/utils/riotId';
+import { useRecentSummoners } from '@/src/hooks/useRecentSummoners';
 import { DateRangePicker } from './DateRangePicker';
 
 export const SUMMONER_SEARCH_INFO =
@@ -18,6 +19,8 @@ export type SummonerSearchPanelProps = {
   showInfoText?: boolean;
   /** 날짜 다이얼로그 id·aria 중복 방지 */
   formIdPrefix?: string;
+  /** localStorage 최근 검색 칩 (기본 true) */
+  showRecent?: boolean;
   className?: string;
 };
 
@@ -28,9 +31,12 @@ export function SummonerSearchPanel({
   initialEndDate,
   showInfoText = true,
   formIdPrefix = 'summoner-search',
+  showRecent = true,
   className = '',
 }: SummonerSearchPanelProps) {
   const today = formatDateToInput(getToday());
+  const { items: recentItems, record: recordRecent, remove: removeRecent, ready: recentReady } =
+    useRecentSummoners();
   const [searchInput, setSearchInput] = useState(initialSummonerInput);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [startDate, setStartDate] = useState(initialStartDate ?? today);
@@ -49,9 +55,7 @@ export function SummonerSearchPanel({
     if (initialEndDate) setEndDate(initialEndDate);
   }, [initialEndDate]);
 
-  const handleSearch = () => {
-    const names = normalizeSummonerSearchInput(searchInput);
-
+  const runSearch = (names: string[]) => {
     if (names.length === 0) {
       alert('소환사명을 입력해주세요.');
       return;
@@ -64,7 +68,19 @@ export function SummonerSearchPanel({
     }
 
     setDateError('');
+    if (showRecent) {
+      recordRecent(names);
+    }
     onSearch(names, startDate, endDate);
+  };
+
+  const handleSearch = () => {
+    runSearch(normalizeSummonerSearchInput(searchInput));
+  };
+
+  const handleRecentChipClick = (riotId: string) => {
+    setSearchInput(riotId);
+    runSearch([riotId]);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -224,6 +240,44 @@ export function SummonerSearchPanel({
           <span className="material-symbols-outlined text-2xl sm:text-3xl">search</span>
         </button>
       </div>
+
+      {showRecent && recentReady && recentItems.length > 0 && (
+        <div className="mt-3 sm:mt-4 min-w-0">
+          <p className="text-[0.65rem] sm:text-xs font-bold text-on-surface-variant tracking-wide mb-2 px-0.5">
+            최근 검색
+          </p>
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-0.5 px-0.5 scroll-pl-1 scroll-pr-2 snap-x snap-mandatory">
+            {recentItems.map((riotId) => (
+              <div
+                key={riotId}
+                className="snap-start shrink-0 inline-flex items-center gap-0.5 max-w-[min(100%,16rem)] rounded-full bg-surface-container pl-3.5 pr-1 py-1.5 shadow-sm"
+              >
+                <button
+                  type="button"
+                  onClick={() => handleRecentChipClick(riotId)}
+                  className="min-w-0 truncate text-left text-xs sm:text-sm font-bold text-on-surface hover:text-primary transition-colors"
+                  title={riotId}
+                >
+                  {riotId}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeRecent(riotId);
+                  }}
+                  className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+                  aria-label={`${riotId} 최근 검색에서 삭제`}
+                >
+                  <span className="material-symbols-outlined text-lg leading-none" aria-hidden>
+                    close
+                  </span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {dateModal}
 
