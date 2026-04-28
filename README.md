@@ -193,7 +193,7 @@ npm run lint     # ESLint 실행
 
 ## 라이선스
 
-© 2024 SGM Company. All rights reserved.
+© 2026 SGM Company. All rights reserved.
 
 ## 문의
 

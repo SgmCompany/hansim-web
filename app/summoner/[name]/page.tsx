@@ -15,6 +15,7 @@ import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
 import { getProfileIconUrl, useLatestVersion, getTierKoreanName, getRankKoreanName, getTierColor } from '@/src/lib/ddragon';
 import { getPrimaryQueue } from '@/src/utils/queue';
 import { summarizeLaneFromChampions } from '@/src/utils/lanePreference';
+import { normalizeSummonerSearchToken } from '@/src/utils/riotId';
 
 type PageProps = {
   params: Promise<{ name: string }>;
@@ -26,6 +27,7 @@ function SummonerContent({ name }: { name: string }) {
   const startDate = searchParams.get('startDate') || undefined;
   const endDate = searchParams.get('endDate') || undefined;
   const decodedName = decodeURIComponent(name);
+  const riotIdForApi = normalizeSummonerSearchToken(decodedName);
 
   const [editSearchOpen, setEditSearchOpen] = useState(false);
   const [portalMounted, setPortalMounted] = useState(false);
@@ -48,7 +50,11 @@ function SummonerContent({ name }: { name: string }) {
     };
   }, [editSearchOpen]);
 
-  const { data, isLoading, isError, error } = useBatchSummary([decodedName], startDate, endDate);
+  const { data, isLoading, isError, error } = useBatchSummary(
+    riotIdForApi ? [riotIdForApi] : [],
+    startDate,
+    endDate,
+  );
   const { data: version } = useLatestVersion();
 
   const today = formatDateToInput(getToday());
