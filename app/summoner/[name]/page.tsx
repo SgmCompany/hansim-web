@@ -15,7 +15,9 @@ import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
 import { getProfileIconUrl, useLatestVersion, getTierKoreanName, getRankKoreanName, getTierColor } from '@/src/lib/ddragon';
 import { getPrimaryQueue } from '@/src/utils/queue';
 import { summarizeLaneFromChampions } from '@/src/utils/lanePreference';
-import { normalizeSummonerSearchToken } from '@/src/utils/riotId';
+import { dedupeSummonerRiotIds, normalizeSummonerSearchToken } from '@/src/utils/riotId';
+import { HansimOpportunityPanel } from '@/src/components/HansimOpportunityPanel';
+import { HlsTierTable } from '@/src/components/HlsTierTable';
 
 type PageProps = {
   params: Promise<{ name: string }>;
@@ -64,13 +66,14 @@ function SummonerContent({ name }: { name: string }) {
 
   const handleApplySearch = (names: string[], s: string, e: string) => {
     setEditSearchOpen(false);
-    if (names.length === 1) {
+    const unique = dedupeSummonerRiotIds(names);
+    if (unique.length === 1) {
       const q = new URLSearchParams({ startDate: s, endDate: e }).toString();
-      router.push(`/summoner/${encodeURIComponent(names[0])}?${q}`);
+      router.push(`/summoner/${encodeURIComponent(unique[0]!)}?${q}`);
       return;
     }
     const q = new URLSearchParams({
-      summoners: names.join(','),
+      summoners: unique.join(','),
       startDate: s,
       endDate: e,
     }).toString();
@@ -242,6 +245,10 @@ function SummonerContent({ name }: { name: string }) {
       </button>
 
       {editSearchModal}
+
+      <HlsTierTable variant="compact" collapsible className="w-full max-w-none" />
+
+      <HansimOpportunityPanel player={player} className="min-w-0 w-full" />
 
       {/*
         모바일: 프로필 → 멀티킬 → 챔피언 → 통계 (order-1~4)

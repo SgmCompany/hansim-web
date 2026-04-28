@@ -174,6 +174,62 @@ export interface components {
             /** @description 가장 많이 플레이한 포지션 (TOP/JUNGLE/MID/BOTTOM/UTILITY). 포지션 정보 없으면 null */
             topPosition?: string;
         };
+        /** @description HLS 부분 점수 */
+        HlsDetail: {
+            /**
+             * Format: int32
+             * @description A. 볼륨 (0~30): 총 플레이 분 + 판수
+             * @example 24
+             */
+            volume?: number;
+            /**
+             * Format: int32
+             * @description B. 결과 (0~20): 패배/서렌/KDA 기반
+             * @example 16
+             */
+            result?: number;
+            /**
+             * Format: int32
+             * @description C. 심야 (0~15): KST 00~06시 누적 분
+             * @example 10
+             */
+            lateNight?: number;
+            /**
+             * Format: int32
+             * @description D. 주말 (0~10): 토/일 누적 분
+             * @example 0
+             */
+            weekend?: number;
+            /**
+             * Format: int32
+             * @description E. 세션 (0~10): 최장 연속 플레이
+             * @example 8
+             */
+            session?: number;
+            /**
+             * Format: int32
+             * @description F. 연패 (0~10): 최대 연속 패배
+             * @example 10
+             */
+            losingStreak?: number;
+            /**
+             * Format: int32
+             * @description G. 분노재큐 (0~5): 패배 후 5분 내 재입장
+             * @example 4
+             */
+            tilt?: number;
+        };
+        /** @description 한심지수 (NINE_TO_SIX 기준) */
+        HlsResponse: {
+            /**
+             * Format: int32
+             * @description 최종 HLS (0~100)
+             * @example 72
+             */
+            total?: number;
+            /** @description 부분 점수 상세 */
+            detail?: components["schemas"]["HlsDetail"];
+        };
         /** @description 멀티킬 합산 */
         MultiKills: {
             /**
@@ -245,6 +301,14 @@ export interface components {
             streak: components["schemas"]["StreakInfo"];
             /** @description 조회 기간 내 챔피언별 통계 (게임 수 내림차순) */
             topChampions: components["schemas"]["Champion"][];
+            /**
+             * Format: int32
+             * @description 전체 큐 합산 총 플레이 시간 (초)
+             * @example 10800
+             */
+            totalPlaySeconds: number;
+            /** @description 한심지수 (NINE_TO_SIX 기준) */
+            hls: components["schemas"]["HlsResponse"];
         };
         /** @description 단일 큐 통계 */
         QueueInfo: {
@@ -272,16 +336,22 @@ export interface components {
              */
             winRate: string;
             /**
-             * Format: int32
-             * @description 한심 점수
-             * @example 42
-             */
-            hansimScore: number;
-            /**
              * @description 평균 KDA (소수점 1자리)
              * @example 3.5
              */
             kda: string;
+            /**
+             * Format: int32
+             * @description 큐 총 플레이 시간 (초)
+             * @example 7200
+             */
+            totalPlaySeconds: number;
+            /**
+             * Format: int32
+             * @description 판당 평균 게임 시간 (초)
+             * @example 1800
+             */
+            avgGameDurationSeconds: number;
             /**
              * @description 분당 평균 CS (소수점 1자리)
              * @example 6.5
@@ -309,6 +379,8 @@ export interface components {
             solo?: components["schemas"]["QueueInfo"];
             /** @description 자유 랭크. 해당 기간 게임 없으면 null */
             flex?: components["schemas"]["QueueInfo"];
+            /** @description 칼바람 나락. 해당 기간 게임 없으면 null */
+            aram?: components["schemas"]["QueueInfo"];
         };
         /** @description 랭크 정보 */
         RankInfo: {

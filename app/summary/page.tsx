@@ -20,19 +20,24 @@ import { MultiKillsInline } from '@/src/components/MultiKillsDisplay';
 import { TopChampionsStrip } from '@/src/components/TopChampionsStrip';
 import { LanePreferenceBlurb } from '@/src/components/LanePreferenceBlurb';
 import { summarizeLaneFromChampions } from '@/src/utils/lanePreference';
-import { normalizeSummonerSearchToken } from '@/src/utils/riotId';
+import { dedupeSummonerRiotIds, normalizeSummonerSearchToken } from '@/src/utils/riotId';
+import { HansimOpportunityPanel } from '@/src/components/HansimOpportunityPanel';
+import { HansimOpportunityFootnote } from '@/src/components/HansimOpportunityFootnote';
+import { HlsTierTable } from '@/src/components/HlsTierTable';
+import { formatPlayDurationMinutes, formatPlayDurationSeconds } from '@/src/utils/totalPlayMinutes';
 
 type Player = components['schemas']['Player'];
 
 function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const summoners =
+  const summoners = dedupeSummonerRiotIds(
     searchParams
       .get('summoners')
       ?.split(',')
       .map((s) => normalizeSummonerSearchToken(s))
-      .filter(Boolean) || [];
+      .filter(Boolean) ?? [],
+  );
   const startDate = searchParams.get('startDate') || undefined;
   const endDate = searchParams.get('endDate') || undefined;
 
@@ -57,6 +62,21 @@ function ResultContent() {
     };
   }, [editSearchOpen]);
 
+  /** URL에 동일 Riot ID가 반복되면 주소만 정리 (렌더 후 1회 교체) */
+  useEffect(() => {
+    const sp = searchParams.get('summoners');
+    if (!sp) return;
+    const raw = sp
+      .split(',')
+      .map((s) => normalizeSummonerSearchToken(s))
+      .filter(Boolean);
+    const deduped = dedupeSummonerRiotIds(raw);
+    if (raw.length === deduped.length) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('summoners', deduped.join(','));
+    router.replace(`/summary?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
+
   const { data, isLoading, isError, error } = useBatchSummary(summoners, startDate, endDate);
 
   const today = formatDateToInput(getToday());
@@ -71,8 +91,9 @@ function ResultContent() {
       router.push(`/summoner/${encodeURIComponent(names[0])}?${q}`);
       return;
     }
+    const unique = dedupeSummonerRiotIds(names);
     const q = new URLSearchParams({
-      summoners: names.join(','),
+      summoners: unique.join(','),
       startDate: s,
       endDate: e,
     }).toString();
@@ -202,11 +223,15 @@ function ResultContent() {
 
       {editSearchModal}
 
+      <HlsTierTable variant="compact" collapsible className="w-full max-w-none" />
+
       <div className="summary-comparison-grid w-full min-w-0">
         {data.players.map((player, index) => (
-          <PlayerCard key={player.riotId} player={player} playerIndex={index} />
+          <PlayerCard key={`${index}-${player.riotId}`} player={player} playerIndex={index} />
         ))}
       </div>
+
+      <HansimOpportunityFootnote className="max-w-prose mx-auto px-1" />
     </div>
   );
 }
@@ -288,6 +313,8 @@ function PlayerCard({ player, playerIndex }: { player: Player; playerIndex: numb
           )}
         </div>
       </header>
+
+      <HansimOpportunityPanel player={player} variant="compact" className="min-w-0" />
 
       <section className="min-w-0" aria-labelledby={`summary-queue-heading-${playerIndex}`}>
         <h3
@@ -377,8 +404,16 @@ function QueueStats({
           <MultiKillsInline multiKills={queue.multiKills} compact />
         </div>
         <div className="flex items-center justify-between gap-2 pt-2 mt-0.5 border-t border-outline-variant/15">
-          <span className="text-[0.7rem] font-bold text-on-surface-variant">한심</span>
-          <span className="font-black text-xl sm:text-2xl text-error tabular-nums">{queue.hansimScore}</span>
+          <span className="text-[0.7rem] font-bold text-on-surface-variant">플레이</span>
+          <span className="font-black text-sm text-on-surface tabular-nums">
+            {formatPlayDurationSeconds(queue.totalPlaySeconds)}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
+          <span className="font-bold text-on-surface-variant">평균 게임</span>
+          <span className="font-black text-on-surface tabular-nums">
+            {formatPlayDurationMinutes(Math.floor(queue.avgGameDurationSeconds / 60))}
+          </span>
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ type LeaderboardSectionProps = {
 export function LeaderboardSection({ players }: LeaderboardSectionProps) {
   return (
     <div className="flex justify-center w-full min-w-0">
-      <div className="w-full max-w-4xl bg-surface-container-lowest p-4 sm:p-6 lg:p-10 hansim-card no-line-boundary">
+      <div className="w-full max-w-4xl rounded-xl border border-outline-variant/15 bg-surface-container-lowest p-4 sm:p-6 lg:p-10 shadow-sm no-line-boundary">
         <div className="flex items-center justify-between mb-6 sm:mb-10">
           <div className="min-w-0 pr-2">
             <h3 className="text-xl sm:text-2xl font-black tracking-tight mb-1">한심왕</h3>
@@ -31,7 +31,7 @@ export function LeaderboardSection({ players }: LeaderboardSectionProps) {
             <Link
               key={player.rank}
               href={`/summoner/${encodeURIComponent(player.name)}`}
-              className={`flex items-center gap-3 sm:gap-6 p-3 sm:p-4 rounded-2xl sm:rounded-3xl cursor-pointer group transition-all min-h-[4.5rem] ${
+              className={`flex items-center gap-3 sm:gap-6 p-3 sm:p-4 rounded-lg sm:rounded-xl cursor-pointer group transition-all min-h-[4.5rem] ${
                 player.rank === 1
                   ? 'bg-primary-container/30 hover:bg-primary-container/50'
                   : 'hover:bg-surface-container'
@@ -50,10 +50,10 @@ export function LeaderboardSection({ players }: LeaderboardSectionProps) {
               <img
                 src={player.avatarUrl}
                 alt={`${player.name} avatar`}
-                className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 rounded-2xl object-cover"
+                className="w-12 h-12 sm:w-16 sm:h-16 shrink-0 rounded-lg object-cover"
               />
 
-              <div className="flex-grow min-w-0">
+              <div className="grow min-w-0">
                 <h4 className="text-base sm:text-lg font-bold truncate">{player.name}</h4>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <span

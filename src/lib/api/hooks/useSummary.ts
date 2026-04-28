@@ -2,6 +2,7 @@ import { useQuery, useQueries, UseQueryResult } from '@tanstack/react-query';
 import { getSummary, getBatchSummary } from '../services/summaryService';
 import { summonerKeys } from '../queryKeys';
 import type { components } from '@/src/types/api.generated';
+import { dedupeSummonerRiotIds } from '@/src/utils/riotId';
 
 type SummaryResponse = components['schemas']['SummaryResponse'];
 type SummaryRequestQuery = components['schemas']['SummaryRequestQuery'];
@@ -15,16 +16,17 @@ type BatchSummaryResponse = components['schemas']['BatchSummaryResponse'];
  * @param endDate 조회 종료일 (yyyy-MM-dd)
  */
 export function useBatchSummary(riotIds: string[], startDate?: string, endDate?: string) {
+  const uniqueIds = dedupeSummonerRiotIds(riotIds);
   const request: BatchSummaryRequest = {
-    riotIds,
+    riotIds: uniqueIds,
     startDate,
     endDate,
   };
 
   return useQuery({
-    queryKey: summonerKeys.batchSummary(riotIds, startDate, endDate),
+    queryKey: summonerKeys.batchSummary(uniqueIds, startDate, endDate),
     queryFn: () => getBatchSummary(request),
-    enabled: riotIds.length > 0 && riotIds.length <= 5,
+    enabled: uniqueIds.length > 0 && uniqueIds.length <= 5,
     staleTime: 5 * 60 * 1000, // 5분 캐싱
     gcTime: 10 * 60 * 1000, // 10분 가비지 컬렉션
   });

@@ -22,9 +22,24 @@ export function normalizeSummonerSearchToken(raw: string): string {
   return `${trimmed}#${DEFAULT_RIOT_TAGLINE}`;
 }
 
+/** 대소문자 무시 후 첫 번째 형태만 유지(순서 보존). 배치 검색·URL 중복으로 인한 키 충돌 방지 */
+export function dedupeSummonerRiotIds(tokens: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const t of tokens) {
+    const key = t.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(t);
+  }
+  return out;
+}
+
+/** 쉼표 구분 입력 → 정규화 후 동일 계정 중복 제거 */
 export function normalizeSummonerSearchInput(commaSeparated: string): string[] {
-  return commaSeparated
+  const raw = commaSeparated
     .split(',')
     .map((t) => normalizeSummonerSearchToken(t))
     .filter((s) => s.length > 0);
+  return dedupeSummonerRiotIds(raw);
 }

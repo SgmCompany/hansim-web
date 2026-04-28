@@ -253,7 +253,7 @@ export function SummonerSearchPanel({
 
   return (
     <div className={`w-full min-w-0 ${className}`}>
-      <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-2xl sm:rounded-3xl no-line-boundary flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch">
+      <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-xl sm:rounded-2xl no-line-boundary flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch">
         <div className="flex-grow relative w-full min-w-0 z-10">
           <span className="material-symbols-outlined absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-outline text-xl sm:text-2xl pointer-events-none z-10">
             search
@@ -286,11 +286,11 @@ export function SummonerSearchPanel({
               id={suggestionListId}
               role="listbox"
               aria-label="최근 검색에서 추천"
-              className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-20 max-h-56 overflow-y-auto rounded-2xl sm:rounded-3xl bg-surface-container-lowest py-2 shadow-xl no-line-boundary ring-1 ring-outline-variant/15"
+              className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-20 max-h-56 overflow-y-auto rounded-xl sm:rounded-2xl bg-surface-container-lowest py-2 shadow-xl no-line-boundary ring-1 ring-outline-variant/15"
               onMouseDown={(e) => e.preventDefault()}
             >
               {suggestions.map((riotId, i) => (
-                <li key={riotId} role="presentation">
+                <li key={`${riotId}-${i}`} role="presentation">
                   <button
                     type="button"
                     id={`${suggestionListId}-opt-${i}`}
@@ -352,9 +352,9 @@ export function SummonerSearchPanel({
             최근 검색
           </p>
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-0.5 px-0.5 scroll-pl-1 scroll-pr-2 snap-x snap-mandatory">
-            {recentItems.map((riotId) => (
+            {recentItems.map((riotId, i) => (
               <div
-                key={riotId}
+                key={`recent-${riotId}-${i}`}
                 className="snap-start shrink-0 inline-flex items-center gap-0.5 max-w-[min(100%,16rem)] rounded-full bg-surface-container pl-3.5 pr-1 py-1.5 shadow-sm"
               >
                 <button
