@@ -14,8 +14,17 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hansim.site'),
   title: '한심지수 - HanSim Level Score, HLS',
   description: '당신의 한심지수를 알아보세요. League of Legends 전적 분석 서비스',
+  openGraph: {
+    title: '한심지수 - HanSim Level Score, HLS',
+    description: '당신의 한심지수를 알아보세요. League of Legends 전적 분석 서비스',
+    url: '/',
+    siteName: '한심지수',
+    locale: 'ko_KR',
+    type: 'website',
+  },
 };
 
 export const viewport: Viewport = {
