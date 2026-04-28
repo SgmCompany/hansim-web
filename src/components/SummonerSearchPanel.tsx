@@ -11,8 +11,9 @@ import {
   suggestRecentsForToken,
 } from '@/src/utils/recentSummoners';
 import { DateRangePicker } from './DateRangePicker';
+import { MAX_BATCH_SUMMONER_COUNT } from '@/src/constants/batchSummary';
 
-export const SUMMONER_SEARCH_INFO = `소환사명·기간(최대 7일)으로 검색합니다. 닉네임만 쓰면 자동으로 #${DEFAULT_RIOT_TAGLINE}이 붙습니다. 여러 명은 쉼표(,)로 구분 — 예: 페이커, 쇼메이커 또는 페이커#KR1`;
+export const SUMMONER_SEARCH_INFO = `소환사명·기간(최대 7일)으로 검색합니다. 닉네임만 쓰면 자동으로 #${DEFAULT_RIOT_TAGLINE}이 붙습니다. 여러 명은 쉼표(,)로 구분(멀티 최대 ${MAX_BATCH_SUMMONER_COUNT}명) — 예: 페이커, 쇼메이커 또는 페이커#KR1`;
 
 export type SummonerSearchPanelProps = {
   onSearch: (summonerNames: string[], startDate: string, endDate: string) => void;
@@ -82,6 +83,10 @@ export function SummonerSearchPanel({
   const runSearch = (names: string[]) => {
     if (names.length === 0) {
       alert('소환사명을 입력해주세요.');
+      return;
+    }
+    if (names.length > MAX_BATCH_SUMMONER_COUNT) {
+      alert(`멀티 검색은 최대 ${MAX_BATCH_SUMMONER_COUNT}명까지 가능합니다.`);
       return;
     }
 

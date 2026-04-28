@@ -20,6 +20,7 @@ import { MultiKillsInline } from '@/src/components/MultiKillsDisplay';
 import { TopChampionsStrip } from '@/src/components/TopChampionsStrip';
 import { LanePreferenceBlurb } from '@/src/components/LanePreferenceBlurb';
 import { summarizeLaneFromChampions } from '@/src/utils/lanePreference';
+import { MAX_BATCH_SUMMONER_COUNT } from '@/src/constants/batchSummary';
 import { dedupeSummonerRiotIds, normalizeSummonerSearchToken } from '@/src/utils/riotId';
 import { HansimOpportunityPanel } from '@/src/components/HansimOpportunityPanel';
 import { HansimOpportunityFootnote } from '@/src/components/HansimOpportunityFootnote';
@@ -99,6 +100,47 @@ function ResultContent() {
     }).toString();
     router.push(`/summary?${q}`);
   };
+
+  if (summoners.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center max-w-md px-4">
+          <span className="material-symbols-outlined text-6xl text-outline mb-4">group_off</span>
+          <h2 className="text-2xl font-black text-on-surface mb-2">검색할 소환사가 없습니다</h2>
+          <p className="text-on-surface-variant mb-6">소환사명을 입력하거나 홈에서 다시 검색해 주세요.</p>
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+          >
+            홈으로
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (summoners.length > MAX_BATCH_SUMMONER_COUNT) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center max-w-md px-4">
+          <span className="material-symbols-outlined text-6xl text-error mb-4">group_remove</span>
+          <h2 className="text-2xl font-black text-on-surface mb-2">멀티 검색 인원이 많습니다</h2>
+          <p className="text-on-surface-variant mb-6">
+            한 번에 비교할 수 있는 소환사는 최대 {MAX_BATCH_SUMMONER_COUNT}명입니다. URL을 수정하거나 검색을 다시
+            입력해 주세요.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+          >
+            홈으로
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

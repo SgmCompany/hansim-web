@@ -14,7 +14,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 다중 소환사 한심 summary 조회 (최대 5명)
+         * 다중 소환사 한심 summary 조회 (최대 10명)
          * @description 여러 소환사의 큐별 승패, 랭크 정보, 스트릭, 챔피언 통계를 한 번에 조회합니다. 비로그인/로그인 모두 사용 가능합니다.
          */
         post: operations["getBatchSummary"];
@@ -107,7 +107,7 @@ export interface components {
         /** @description 다중 소환사 한심 지수 조회 요청 */
         BatchSummaryRequest: {
             /**
-             * @description 조회할 Riot ID 목록. '이름#태그' 또는 '이름-태그' 형식 모두 허용. 최소 1명 최대 5명
+             * @description 조회할 Riot ID 목록. '이름#태그' 또는 '이름-태그' 형식 모두 허용. 최소 1명 최대 10명
              * @example [
              *       "페이커#KR1",
              *       "카나비#KR1"
