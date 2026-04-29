@@ -1,6 +1,6 @@
 'use client';
 
-import { use, Suspense, useEffect, useState } from 'react';
+import { use, Suspense, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '../../../src/components/Navigation';
@@ -10,7 +10,7 @@ import { StatsGrid } from '@/src/components/StatsGrid';
 import { MultiKillsCard } from '@/src/components/MultiKillsDisplay';
 import { TopChampionsStrip } from '@/src/components/TopChampionsStrip';
 import { SummonerSearchPanel } from '@/src/components/SummonerSearchPanel';
-import { formatDateToInput, getToday } from '@/src/utils/date';
+import { formatDateToInput, getToday, normalizeSummaryDateRange } from '@/src/utils/date';
 import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
 import { getProfileIconUrl, useLatestVersion, getTierKoreanName, getRankKoreanName, getTierColor } from '@/src/lib/ddragon';
 import { getPrimaryQueue } from '@/src/utils/queue';
@@ -26,8 +26,20 @@ type PageProps = {
 function SummonerContent({ name }: { name: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const startDate = searchParams.get('startDate') || undefined;
-  const endDate = searchParams.get('endDate') || undefined;
+  const rawStartIn = searchParams.get('startDate');
+  const rawEndIn = searchParams.get('endDate');
+  const rawStart = rawStartIn?.trim() ? rawStartIn.trim() : undefined;
+  const rawEnd = rawEndIn?.trim() ? rawEndIn.trim() : undefined;
+  const today = formatDateToInput(getToday());
+
+  const { startDate, endDate } = useMemo(() => {
+    if (rawStart == null && rawEnd == null) {
+      return { startDate: undefined as string | undefined, endDate: undefined as string | undefined };
+    }
+    const n = normalizeSummaryDateRange(rawStart ?? today, rawEnd ?? today);
+    return { startDate: n.start, endDate: n.end };
+  }, [rawStart, rawEnd, today]);
+
   const decodedName = decodeURIComponent(name);
   const riotIdForApi = normalizeSummonerSearchToken(decodedName);
 
@@ -52,6 +64,21 @@ function SummonerContent({ name }: { name: string }) {
     };
   }, [editSearchOpen]);
 
+  useEffect(() => {
+    if (rawStart == null && rawEnd == null) return;
+    const n = normalizeSummaryDateRange(rawStart ?? today, rawEnd ?? today);
+    if (
+      n.start === (rawStart ?? '') &&
+      n.end === (rawEnd ?? '')
+    ) {
+      return;
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('startDate', n.start);
+    params.set('endDate', n.end);
+    router.replace(`/summoner/${encodeURIComponent(decodedName)}?${params.toString()}`, { scroll: false });
+  }, [rawStart, rawEnd, today, searchParams, router, decodedName]);
+
   const { data, isLoading, isError, error } = useBatchSummary(
     riotIdForApi ? [riotIdForApi] : [],
     startDate,
@@ -59,7 +86,6 @@ function SummonerContent({ name }: { name: string }) {
   );
   const { data: version } = useLatestVersion();
 
-  const today = formatDateToInput(getToday());
   const initialSummonerInput = data?.players[0]?.riotId ?? decodedName;
   const initialStart = startDate ?? today;
   const initialEnd = endDate ?? today;

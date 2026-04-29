@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/src/components/Navigation';
 import { Footer } from '@/src/components/Footer';
 import { SummonerSearchPanel } from '@/src/components/SummonerSearchPanel';
-import { formatDateToInput, getToday } from '@/src/utils/date';
+import { formatDateToInput, getToday, normalizeSummaryDateRange } from '@/src/utils/date';
 import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
 import {
   getTierKoreanName,
@@ -55,8 +55,19 @@ function ResultContent() {
       .map((s) => normalizeSummonerSearchToken(s))
       .filter(Boolean) ?? [],
   );
-  const startDate = searchParams.get('startDate') || undefined;
-  const endDate = searchParams.get('endDate') || undefined;
+  const rawStartIn = searchParams.get('startDate');
+  const rawEndIn = searchParams.get('endDate');
+  const rawStart = rawStartIn?.trim() ? rawStartIn.trim() : undefined;
+  const rawEnd = rawEndIn?.trim() ? rawEndIn.trim() : undefined;
+  const today = formatDateToInput(getToday());
+
+  const { startDate, endDate } = useMemo(() => {
+    if (rawStart == null && rawEnd == null) {
+      return { startDate: undefined as string | undefined, endDate: undefined as string | undefined };
+    }
+    const n = normalizeSummaryDateRange(rawStart ?? today, rawEnd ?? today);
+    return { startDate: n.start, endDate: n.end };
+  }, [rawStart, rawEnd, today]);
 
   const [editSearchOpen, setEditSearchOpen] = useState(false);
   const [portalMounted, setPortalMounted] = useState(false);
@@ -94,9 +105,18 @@ function ResultContent() {
     router.replace(`/summary?${params.toString()}`, { scroll: false });
   }, [searchParams, router]);
 
+  useEffect(() => {
+    if (rawStart == null && rawEnd == null) return;
+    const n = normalizeSummaryDateRange(rawStart ?? today, rawEnd ?? today);
+    if (n.start === (rawStart ?? '') && n.end === (rawEnd ?? '')) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('startDate', n.start);
+    params.set('endDate', n.end);
+    router.replace(`/summary?${params.toString()}`, { scroll: false });
+  }, [rawStart, rawEnd, today, searchParams, router]);
+
   const { data, isLoading, isError, error } = useBatchSummary(summoners, startDate, endDate);
 
-  const today = formatDateToInput(getToday());
   const initialSummonerInput = summoners.join(', ');
   const initialStart = startDate ?? today;
   const initialEnd = endDate ?? today;
