@@ -44,11 +44,11 @@ export function SummonerProfile({
 
   return (
     <header
-      className={`bg-surface-container-lowest p-4 sm:p-6 rounded-2xl sm:rounded-3xl no-line-boundary ${className}`.trim()}
+      className={`bg-surface-container-lowest p-4 sm:p-6 rounded-sm sm:rounded-md no-line-boundary ${className}`.trim()}
     >
       <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
         <div className="relative shrink-0">
-          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-surface-container overflow-hidden">
+          <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-sm bg-surface-container overflow-hidden">
             <img
               src={summoner.avatarUrl}
               alt={`${summoner.name} avatar`}

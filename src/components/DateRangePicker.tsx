@@ -199,13 +199,13 @@ export function DateRangePicker({
   ];
 
   return (
-    <div className="bg-surface-container-low rounded-2xl p-4 max-w-[min(100%,17.5rem)] mx-auto">
+    <div className="bg-surface-container-low rounded-sm sm:rounded-md p-4 max-w-[min(100%,17.5rem)] mx-auto">
       {/* 월 네비게이션 */}
       <div className="flex items-center justify-between mb-2 gap-1">
         <button
           type="button"
           onClick={goToPrevMonth}
-          className="p-1 hover:bg-surface-container rounded-lg transition-colors shrink-0"
+          className="p-1 hover:bg-surface-container rounded-sm transition-colors shrink-0"
           aria-label="이전 달"
         >
           <span className="material-symbols-outlined text-[1.125rem] leading-none">
@@ -217,7 +217,7 @@ export function DateRangePicker({
           <button
             type="button"
             onClick={goToToday}
-            className="px-2 py-0.5 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 rounded-md transition-colors shrink-0"
+            className="px-2 py-0.5 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 rounded-sm transition-colors shrink-0"
           >
             오늘
           </button>
@@ -230,7 +230,7 @@ export function DateRangePicker({
           type="button"
           onClick={goToNextMonth}
           disabled={!canGoToNextMonth()}
-          className="p-1 rounded-lg transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-surface-container enabled:cursor-pointer"
+          className="p-1 rounded-sm transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-surface-container enabled:cursor-pointer"
           aria-label="다음 달"
         >
           <span className="material-symbols-outlined text-[1.125rem] leading-none">
@@ -244,7 +244,7 @@ export function DateRangePicker({
         <button
           type="button"
           onClick={() => setSelectingStart(true)}
-          className={`flex-1 min-w-0 px-2 py-1.5 rounded-xl font-bold text-[0.6875rem] transition-all truncate ${
+          className={`flex-1 min-w-0 px-2 py-1.5 rounded-md font-bold text-[0.6875rem] transition-all truncate ${
             selectingStart
               ? 'bg-primary text-white shadow-sm'
               : 'bg-surface-container text-on-surface-variant'
@@ -255,7 +255,7 @@ export function DateRangePicker({
         <button
           type="button"
           onClick={() => setSelectingStart(false)}
-          className={`flex-1 min-w-0 px-2 py-1.5 rounded-xl font-bold text-[0.6875rem] transition-all truncate ${
+          className={`flex-1 min-w-0 px-2 py-1.5 rounded-md font-bold text-[0.6875rem] transition-all truncate ${
             !selectingStart
               ? 'bg-primary text-white shadow-sm'
               : 'bg-surface-container text-on-surface-variant'
@@ -292,7 +292,7 @@ export function DateRangePicker({
           const isTodayDate = isToday(date);
 
           let dayClasses =
-            'h-8 w-full text-[0.75rem] font-bold rounded-lg transition-colors flex items-center justify-center';
+            'h-8 w-full text-[0.75rem] font-bold rounded-md transition-colors flex items-center justify-center';
           if (isFuture) {
             dayClasses += ' text-on-surface/25 opacity-40 cursor-not-allowed';
           } else if (isStart || isEnd) {

@@ -32,7 +32,7 @@ export function HansimOpportunityPanel({
   if (variant === 'compact') {
     return (
       <div
-        className={`rounded-xl bg-surface-container/90 border border-outline-variant/15 px-2.5 py-2 sm:px-3 sm:py-2.5 ${className}`.trim()}
+        className={`rounded-sm bg-surface-container/90 border border-outline-variant/15 px-2.5 py-2 sm:px-3 sm:py-2.5 ${className}`.trim()}
         role="region"
         aria-label="한심지수·플레이·최저시급 환산"
       >
@@ -79,7 +79,7 @@ export function HansimOpportunityPanel({
 
   return (
     <section
-      className={`rounded-2xl bg-surface-container border border-outline-variant/20 p-4 sm:p-5 space-y-4 ${className}`.trim()}
+      className={`rounded-sm bg-surface-container border border-outline-variant/20 p-4 sm:p-5 space-y-4 ${className}`.trim()}
       aria-label="한심지수 및 플레이 시간 기회비용"
     >
       {/* 1. 총점 + 등급 + 등급 멘트 */}
@@ -123,7 +123,7 @@ export function HansimOpportunityPanel({
             {highlightLines.map((line, i) => (
               <li
                 key={i}
-                className="text-sm sm:text-base text-on-surface leading-snug flex gap-2 pl-1 border-l-2 border-primary/40 bg-primary/5 rounded-r-lg py-2 pr-3"
+                className="text-sm sm:text-base text-on-surface leading-snug flex gap-2 pl-1 border-l-2 border-primary/40 bg-primary/5 rounded-r-sm py-2 pr-3"
               >
                 <span className="shrink-0" aria-hidden>
                   💬

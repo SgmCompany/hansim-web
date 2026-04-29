@@ -30,7 +30,7 @@ export function StatsGrid({ stats, layout = 'default' }: StatsGridProps) {
 
   const cardBase = compact
     ? 'summoner-stat-card bg-surface-container-lowest flex flex-col shadow-sm'
-    : 'bg-surface-container-lowest rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col shadow-sm min-h-[9.5rem] sm:min-h-0';
+    : 'bg-surface-container-lowest rounded-sm sm:rounded-md p-4 sm:p-5 flex flex-col shadow-sm min-h-[9.5rem] sm:min-h-0';
 
   const winCardExtra = compact
     ? 'items-center justify-center text-center'

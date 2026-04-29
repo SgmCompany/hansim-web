@@ -46,10 +46,10 @@ export function TopChampionsStrip({ champions, surface = 'nested', className = '
             return (
               <div
                 key={champion.championId}
-                className="bg-surface-container p-3 sm:p-4 rounded-2xl text-center w-[min(7.75rem,calc((100vw-3.5rem)/2))] sm:min-w-[7.5rem] sm:max-w-[8.5rem] sm:w-auto shrink-0 snap-start"
+                className="bg-surface-container p-3 sm:p-4 rounded-sm text-center w-[min(7.75rem,calc((100vw-3.5rem)/2))] sm:min-w-[7.5rem] sm:max-w-[8.5rem] sm:w-auto shrink-0 snap-start"
               >
                 {championKey && (
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-2 rounded-xl overflow-hidden">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-2 rounded-sm overflow-hidden">
                     <img
                       src={getChampionImageUrl(championKey, version)}
                       alt={championName}

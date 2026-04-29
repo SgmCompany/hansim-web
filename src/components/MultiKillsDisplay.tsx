@@ -47,7 +47,7 @@ export function MultiKillsInline({ multiKills, compact }: InlineProps) {
       {cells.map(({ label, value }) => (
         <div
           key={label}
-          className="rounded-xl bg-surface-container-low/80 px-1 py-1.5 sm:px-2 sm:py-2 text-center min-w-0"
+          className="rounded-sm bg-surface-container-low/80 px-1 py-1.5 sm:px-2 sm:py-2 text-center min-w-0"
         >
           <div className="text-[0.6rem] sm:text-[0.65rem] font-bold text-on-surface-variant leading-tight">
             {label}
@@ -71,7 +71,7 @@ export function MultiKillsCard({ multiKills, hideWhenEmpty, subtitle, className 
 
   return (
     <section
-      className={`bg-surface-container-lowest rounded-2xl sm:rounded-3xl p-4 sm:p-6 no-line-boundary shadow-sm mb-4 sm:mb-6 ${className}`.trim()}
+      className={`bg-surface-container-lowest rounded-sm sm:rounded-md p-4 sm:p-6 no-line-boundary shadow-sm mb-4 sm:mb-6 ${className}`.trim()}
       aria-label="멀티킬"
     >
       <div className="flex items-center gap-1.5 mb-2">
