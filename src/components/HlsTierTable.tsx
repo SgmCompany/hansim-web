@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { getHlsDataSignalEntries, HLS_SCORE_MODEL } from '@/src/constants/hlsDataSignals';
+import { HLS_FULL_NAME_EN, HLS_FULL_NAME_KO_READING, HLS_TITLE_TOOLTIP } from '@/src/constants/hlsNaming';
 import { HLS_TIERS, formatHlsScoreRange, type HlsTierDef } from '@/src/constants/hlsTier';
 
 type Variant = 'full' | 'compact' | 'sidebar';
@@ -68,7 +69,11 @@ function HlsDataSignalsBlock({ dense }: { dense?: boolean }) {
       >
         총점 모델은 <strong className="font-bold text-on-surface">{HLS_SCORE_MODEL}</strong>입니다.
         원천 데이터는 <strong className="font-bold text-on-surface">Riot 제공 매치</strong>에서
-        가져오며, 부분 점수 상한 등은 서버 산식에 따라 최종 HLS가 정해집니다.
+        가져오며, 부분 점수 상한 등은 서버 산식에 따라 최종{' '}
+        <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help font-semibold text-on-surface decoration-dotted underline-offset-2">
+          HLS
+        </abbr>
+        가 정해집니다.
       </p>
       <ul className={`space-y-3 ${dense ? 'text-[0.7rem] sm:text-xs' : 'text-xs sm:text-sm'}`}>
         {items.map((item) => (
@@ -108,6 +113,9 @@ export function HlsTierTable({
         >
           한심지수 등급
         </h3>
+        <p className="text-[0.6rem] text-on-surface-variant leading-snug mb-1">
+          영문 명칭 <span lang="en">{HLS_FULL_NAME_EN}</span>({HLS_FULL_NAME_KO_READING})의 줄임이에요.
+        </p>
         <p className="text-[0.6rem] text-on-surface-variant leading-snug mb-2.5">
           0~100 · 높을수록 한심↑ — 행에 포인터를 올리면 멘트 예시를 볼 수 있어요.
         </p>
@@ -117,7 +125,9 @@ export function HlsTierTable({
             <thead>
               <tr className="bg-surface-container-high/80 text-on-surface-variant font-bold">
                 <th scope="col" className="py-1.5 px-1.5 w-[30%]">
-                  HLS
+                  <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+                    HLS
+                  </abbr>
                 </th>
                 <th scope="col" className="py-1.5 px-1.5">
                   등급
@@ -159,7 +169,9 @@ export function HlsTierTable({
               <thead>
                 <tr className="bg-surface-container-high/80 text-[0.65rem] sm:text-xs font-bold text-on-surface-variant uppercase tracking-wide">
                   <th scope="col" className="py-2.5 px-3 rounded-tl-sm w-26">
-                    HLS
+                    <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+                      HLS
+                    </abbr>
                   </th>
                   <th scope="col" className="py-2.5 px-3 w-36">
                     등급
@@ -189,7 +201,9 @@ export function HlsTierTable({
             <thead>
               <tr className="text-on-surface-variant font-bold border-b border-outline-variant/20">
                 <th scope="col" className="py-1.5 pr-2 whitespace-nowrap">
-                  HLS
+                  <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+                    HLS
+                  </abbr>
                 </th>
                 <th scope="col" className="py-1.5 pr-2">
                   등급
@@ -233,7 +247,12 @@ export function HlsTierTable({
           한심지수 표기 안내
         </h3>
         <p className="text-on-surface-variant text-xs sm:text-sm leading-relaxed">
-          HLS(HanSim Level Score)는 <strong className="text-on-surface">0~100</strong>점이며,{' '}
+          한심지수를 영문으로 풀어 쓰면 <span lang="en">{HLS_FULL_NAME_EN}</span>({HLS_FULL_NAME_KO_READING})이며,
+          줄여서{' '}
+          <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help font-semibold text-on-surface decoration-dotted underline-offset-2">
+            HLS
+          </abbr>
+          라고 표기합니다. 점수는 <strong className="text-on-surface">0~100</strong>점이며,{' '}
           <strong className="text-on-surface">높을수록 한심도가 올라갑니다</strong>. 같은 구간이라도
           플레이 패턴에 따라 멘트는 달라질 수 있어요 — 재미 위한 셀프디스예요.
         </p>
@@ -260,7 +279,13 @@ export function HlsTierTable({
         <summary className="list-none cursor-pointer flex items-center justify-between gap-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base font-black text-on-surface hover:bg-surface-container/40 rounded-sm transition-colors [&::-webkit-details-marker]:hidden">
           <span className="inline-flex items-center gap-2 min-w-0">
             <span aria-hidden>📊</span>
-            <span className="truncate">한심지수(HLS) 등급·데이터 기준</span>
+            <span className="truncate">
+              한심지수(
+              <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+                HLS
+              </abbr>
+              ) 등급·데이터 기준
+            </span>
           </span>
           <span
             className="material-symbols-outlined text-xl text-on-surface-variant shrink-0 transition-transform group-open:rotate-180"
@@ -270,6 +295,12 @@ export function HlsTierTable({
           </span>
         </summary>
         <div className="px-3 pb-3 sm:px-4 sm:pb-4 pt-0 border-t border-outline-variant/10">
+          <p className="text-[0.65rem] sm:text-xs text-on-surface-variant leading-relaxed mb-3 px-0.5">
+            <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help font-semibold text-on-surface decoration-dotted underline-offset-2">
+              HLS
+            </abbr>
+            는 영문 명칭 <span lang="en">{HLS_FULL_NAME_EN}</span>({HLS_FULL_NAME_KO_READING})의 줄임입니다.
+          </p>
           {tierTable}
           <div className="mt-4 pt-3 border-t border-outline-variant/10">
             <HlsDataSignalsBlock dense />
@@ -280,8 +311,14 @@ export function HlsTierTable({
       <div
         className={`rounded-sm border border-outline-variant/20 bg-surface-container-low/80 px-3 py-2.5 sm:px-4 sm:py-3 no-line-boundary ${className}`.trim()}
       >
-        <p className="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-wide mb-2">
-          HLS 등급 기준
+        <p className="text-[0.65rem] font-bold text-on-surface-variant tracking-wide mb-1">
+          <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+            HLS
+          </abbr>{' '}
+          등급 기준
+        </p>
+        <p className="text-[0.6rem] text-on-surface-variant leading-snug mb-2">
+          영문 명칭 <span lang="en">{HLS_FULL_NAME_EN}</span>({HLS_FULL_NAME_KO_READING})의 줄임입니다.
         </p>
         {tierTable}
       </div>
