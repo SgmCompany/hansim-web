@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/src/components/Navigation';
@@ -26,8 +26,24 @@ import { HansimOpportunityPanel } from '@/src/components/HansimOpportunityPanel'
 import { HansimOpportunityFootnote } from '@/src/components/HansimOpportunityFootnote';
 import { HlsTierTable } from '@/src/components/HlsTierTable';
 import { formatPlayDurationMinutes, formatPlayDurationSeconds } from '@/src/utils/totalPlayMinutes';
+import { LeaderboardSection } from '@/src/components/LeaderboardSection';
+import { buildHlsLeaderboardRows, HANSIM_KING_TOP_N } from '@/src/utils/hlsLeaderboard';
+import { SummaryJumpNav } from '@/src/components/SummaryJumpNav';
 
 type Player = components['schemas']['Player'];
+
+function SummaryHlsLeaderboard({ players }: { players: Player[] }) {
+  const { data: version } = useLatestVersion();
+  const rows = useMemo(() => buildHlsLeaderboardRows(players, version), [players, version]);
+
+  return (
+    <LeaderboardSection
+      players={rows}
+      title={`한심왕 TOP${HANSIM_KING_TOP_N}`}
+      subtitle={`이번 검색·기간 기준 HLS 상위 ${HANSIM_KING_TOP_N}명입니다.`}
+    />
+  );
+}
 
 function ResultContent() {
   const router = useRouter();
@@ -265,13 +281,23 @@ function ResultContent() {
 
       {editSearchModal}
 
-      <HlsTierTable variant="compact" collapsible className="w-full max-w-none" />
+      <SummaryJumpNav />
 
-      <div className="summary-comparison-grid w-full min-w-0">
-        {data.players.map((player, index) => (
-          <PlayerCard key={`${index}-${player.riotId}`} player={player} playerIndex={index} />
-        ))}
-      </div>
+      <section id="summary-section-hls" className="min-w-0 scroll-mt-4">
+        <HlsTierTable variant="compact" collapsible className="w-full max-w-none" />
+      </section>
+
+      <section id="summary-section-leaderboard" className="min-w-0 scroll-mt-4">
+        <SummaryHlsLeaderboard players={data.players} />
+      </section>
+
+      <section id="summary-section-detail" className="min-w-0 scroll-mt-4">
+        <div className="summary-comparison-grid w-full min-w-0">
+          {data.players.map((player, index) => (
+            <PlayerCard key={`${index}-${player.riotId}`} player={player} playerIndex={index} />
+          ))}
+        </div>
+      </section>
 
       <HansimOpportunityFootnote className="max-w-prose mx-auto px-1" />
     </div>

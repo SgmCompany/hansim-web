@@ -1,4 +1,5 @@
 import type { components } from '@/src/types/api.generated';
+import { HLS_TITLE_TOOLTIP } from '@/src/constants/hlsNaming';
 import { KOREA_MINIMUM_WAGE_2026 } from '@/src/constants/koreaMinimumWage';
 import { getHlsTier } from '@/src/constants/hlsTier';
 import { HansimOpportunityFootnote } from '@/src/components/HansimOpportunityFootnote';
@@ -48,7 +49,11 @@ export function HansimOpportunityPanel({
         <dl className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 text-[0.72rem] sm:text-sm">
           {d.hlsTotal != null ? (
             <div className="flex items-baseline gap-1 shrink-0">
-              <dt className="font-bold text-on-surface-variant">HLS</dt>
+              <dt className="font-bold text-on-surface-variant">
+                <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+                  HLS
+                </abbr>
+              </dt>
               <dd className="font-black tabular-nums text-error text-base sm:text-lg leading-none">
                 {d.hlsTotal}
               </dd>
@@ -86,10 +91,11 @@ export function HansimOpportunityPanel({
       {d.hlsTotal != null && tier ? (
         <header className="flex flex-col gap-1.5 pb-4 border-b border-outline-variant/20">
           <div className="flex flex-wrap items-end gap-x-3 gap-y-2">
-            <span
-              className="text-[0.72rem] font-bold text-on-surface-variant uppercase tracking-wide"
-            >
-              HLS 총점
+            <span className="text-[0.72rem] font-bold text-on-surface-variant uppercase tracking-wide">
+              <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+                HLS
+              </abbr>{' '}
+              총점
             </span>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="font-black text-4xl sm:text-5xl text-error tabular-nums leading-none">

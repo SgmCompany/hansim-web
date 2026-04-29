@@ -1,5 +1,6 @@
 'use client';
 
+import { HLS_FULL_NAME_EN, HLS_FULL_NAME_KO_READING, HLS_TITLE_TOOLTIP } from '@/src/constants/hlsNaming';
 import { SummonerSearchPanel } from './SummonerSearchPanel';
 
 type HeroSectionProps = {
@@ -16,6 +17,13 @@ export function HeroSection({ onSearch }: HeroSectionProps) {
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter text-on-background leading-tight px-1">
           당신의 <span className="text-primary">한심지수</span>를 알아보세요
         </h1>
+        <p className="text-xs sm:text-sm text-on-surface-variant mt-3 max-w-xl mx-auto leading-snug px-2">
+          한심지수(
+          <abbr title={HLS_TITLE_TOOLTIP} className="cursor-help decoration-dotted underline-offset-2">
+            HLS
+          </abbr>
+          )는 <span lang="en">{HLS_FULL_NAME_EN}</span>({HLS_FULL_NAME_KO_READING})의 줄임입니다.
+        </p>
       </div>
 
       <div className="w-full max-w-4xl">

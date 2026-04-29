@@ -4,6 +4,21 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* 고정 네비·스티키 구역 바 보정 — 앵커·scrollIntoView 시 상단 여백 */
+  scroll-padding-top: calc(6rem + env(safe-area-inset-top, 0px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: calc(7rem + env(safe-area-inset-top, 0px));
+  }
 }
 
 body {
