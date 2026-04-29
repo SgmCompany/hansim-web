@@ -1,7 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { formatDateToInput, getDaysDifference, getToday } from '@/src/utils/date';
+import {
+  formatDateToInput,
+  getDaysDifference,
+  getToday,
+  getMinSelectableSummaryYearMonth,
+  maxDateStr,
+  MIN_SELECTABLE_SUMMARY_DATE,
+} from '@/src/utils/date';
 
 function dateStrToday(): string {
   return formatDateToInput(getToday());
@@ -21,10 +28,13 @@ function isDateAfterToday(date: Date): boolean {
 function initialCalendarViewFromStart(startDate: string): { year: number; month: number } {
   const today = getToday();
   const maxCalendarYear = today.getFullYear();
-  const minCalendarYear = Math.max(2015, maxCalendarYear - 15);
+  const { year: minY, monthIndex0: minM0 } = getMinSelectableSummaryYearMonth();
 
   const maxMonthIndexForYear = (year: number): number =>
     year === maxCalendarYear ? today.getMonth() : 11;
+
+  const minMonthIndexForYear = (year: number): number =>
+    year < minY ? minM0 : year > minY ? 0 : minM0;
 
   const parsed = /^(\d{4})-(\d{2})-\d{2}$/.exec(startDate.trim());
   if (!parsed) {
@@ -34,8 +44,8 @@ function initialCalendarViewFromStart(startDate: string): { year: number; month:
   let year = Number(parsed[1]);
   let month = Number(parsed[2]) - 1;
 
-  if (year < minCalendarYear) {
-    return { year: minCalendarYear, month: 0 };
+  if (year < minY || (year === minY && month < minM0)) {
+    return { year: minY, month: minM0 };
   }
   if (year > maxCalendarYear) {
     return {
@@ -45,8 +55,12 @@ function initialCalendarViewFromStart(startDate: string): { year: number; month:
   }
 
   const cap = maxMonthIndexForYear(year);
+  const floor = minMonthIndexForYear(year);
   if (month > cap) {
     return { year, month: cap };
+  }
+  if (month < floor) {
+    return { year, month: floor };
   }
   return { year, month };
 }
@@ -73,10 +87,14 @@ export function DateRangePicker({
 
   const today = getToday();
   const maxCalendarYear = today.getFullYear();
-  const minCalendarYear = Math.max(2015, maxCalendarYear - 15);
+  const { year: minY, monthIndex0: minM0 } = getMinSelectableSummaryYearMonth();
+  const minCalendarYear = minY;
 
   const maxMonthIndexForYear = (year: number): number =>
     year === maxCalendarYear ? today.getMonth() : 11;
+
+  const minMonthIndexForYear = (year: number): number =>
+    year < minY ? minM0 : year > minY ? 0 : minM0;
 
   const yearOptions = useMemo(
     () =>
@@ -88,12 +106,14 @@ export function DateRangePicker({
   );
 
   useEffect(() => {
-    const cap = maxMonthIndexForYear(viewYear);
-    setViewMonth((m) => (m > cap ? cap : m));
-  }, [viewYear]);
+    const refNow = getToday();
+    const refMaxYear = refNow.getFullYear();
+    const floor = viewYear < minY ? minM0 : viewYear > minY ? 0 : minM0;
+    const cap = viewYear === refMaxYear ? refNow.getMonth() : 11;
+    setViewMonth((m) => Math.min(Math.max(m, floor), cap));
+  }, [viewYear, minY, minM0]);
 
-  const canGoToPrevMonth = (): boolean =>
-    !(viewYear === minCalendarYear && viewMonth === 0);
+  const canGoToPrevMonth = (): boolean => !(viewYear === minY && viewMonth === minM0);
 
   const goToPrevMonth = () => {
     if (!canGoToPrevMonth()) return;
@@ -145,6 +165,10 @@ export function DateRangePicker({
       return;
     }
 
+    if (dateStr < MIN_SELECTABLE_SUMMARY_DATE) {
+      return;
+    }
+
     const todayStr = dateStrToday();
     const currentStart = new Date(startDate);
     const currentEnd = new Date(endDate);
@@ -185,7 +209,7 @@ export function DateRangePicker({
       if (diffDays > 7) {
         const newStart = new Date(endAsDate);
         newStart.setDate(newStart.getDate() - 7);
-        onStartDateChange(formatDateToInput(newStart));
+        onStartDateChange(maxDateStr(formatDateToInput(newStart), MIN_SELECTABLE_SUMMARY_DATE));
       }
 
       setSelectingStart(true);
@@ -266,9 +290,16 @@ export function DateRangePicker({
     '12월',
   ];
 
-  const viewMonthCap = maxMonthIndexForYear(viewYear);
-  const monthIndicesForViewYear = Array.from({ length: viewMonthCap + 1 }, (_, i) => i);
-  const monthSelectValue = Math.min(viewMonth, viewMonthCap);
+  const viewMonthFloor = minMonthIndexForYear(viewYear);
+  let viewMonthCap = maxMonthIndexForYear(viewYear);
+  if (viewMonthCap < viewMonthFloor) {
+    viewMonthCap = viewMonthFloor;
+  }
+  const monthIndicesForViewYear = Array.from(
+    { length: viewMonthCap - viewMonthFloor + 1 },
+    (_, i) => viewMonthFloor + i,
+  );
+  const monthSelectValue = Math.min(Math.max(viewMonth, viewMonthFloor), viewMonthCap);
 
   const selectBaseClass =
     'max-w-[min(48%,9.5rem)] min-w-0 shrink rounded-sm border border-outline-variant/35 bg-surface-container py-1.5 pl-2 pr-1.5 text-xs sm:text-sm font-black text-on-surface cursor-pointer hover:border-primary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors';
@@ -390,6 +421,7 @@ export function DateRangePicker({
 
           const dateStr = formatDateToInput(date);
           const isFuture = isDateAfterToday(date);
+          const isBeforeMin = dateStr < MIN_SELECTABLE_SUMMARY_DATE;
           const inRange = isDateInRange(date);
           const isStart = isStartDate(date);
           const isEnd = isEndDate(date);
@@ -397,7 +429,7 @@ export function DateRangePicker({
 
           let dayClasses =
             'h-8 w-full text-[0.75rem] font-bold rounded-md transition-colors flex items-center justify-center';
-          if (isFuture) {
+          if (isFuture || isBeforeMin) {
             dayClasses += ' text-on-surface/25 opacity-40 cursor-not-allowed';
           } else if (isStart || isEnd) {
             dayClasses +=
@@ -407,7 +439,7 @@ export function DateRangePicker({
           } else {
             dayClasses += ' text-on-surface hover:bg-surface-container';
           }
-          if (isTodayDate && !isStart && !isEnd && !isFuture) {
+          if (isTodayDate && !isStart && !isEnd && !isFuture && !isBeforeMin) {
             dayClasses += ' ring-1 ring-primary/60 ring-inset';
           }
 
@@ -415,7 +447,7 @@ export function DateRangePicker({
             <button
               key={dateStr}
               type="button"
-              disabled={isFuture}
+              disabled={isFuture || isBeforeMin}
               onClick={() => handleDateClick(dateStr)}
               className={dayClasses}
             >
@@ -432,7 +464,8 @@ export function DateRangePicker({
         </p>
       )}
       <p className="mt-2 text-on-surface-variant text-[0.625rem] leading-snug">
-        오늘 이후 날짜는 선택할 수 없으며, 기간은 최대 7일까지입니다.
+        오늘 이후 날짜는 선택할 수 없으며, 기간은 최대 7일까지입니다. 검색 가능한 시작일은{' '}
+        {MIN_SELECTABLE_SUMMARY_DATE.replace(/-/g, '.')} 이후입니다.
       </p>
     </div>
   );

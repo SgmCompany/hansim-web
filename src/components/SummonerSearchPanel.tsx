@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { formatDateToInput, getToday, isValidDateRange } from '@/src/utils/date';
+import { formatDateToInput, getToday, isValidDateRange, normalizeSummaryDateRange } from '@/src/utils/date';
 import { DEFAULT_RIOT_TAGLINE, normalizeSummonerSearchInput } from '@/src/utils/riotId';
 import { useRecentSummoners } from '@/src/hooks/useRecentSummoners';
 import {
@@ -48,8 +48,12 @@ export function SummonerSearchPanel({
   } = useRecentSummoners();
   const [searchInput, setSearchInput] = useState(initialSummonerInput);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [startDate, setStartDate] = useState(initialStartDate ?? today);
-  const [endDate, setEndDate] = useState(initialEndDate ?? today);
+  const [startDate, setStartDate] = useState(() =>
+    normalizeSummaryDateRange(initialStartDate ?? today, initialEndDate ?? today).start,
+  );
+  const [endDate, setEndDate] = useState(() =>
+    normalizeSummaryDateRange(initialStartDate ?? today, initialEndDate ?? today).end,
+  );
   const [dateError, setDateError] = useState('');
   const [inputFocused, setInputFocused] = useState(false);
   const [suggestHighlight, setSuggestHighlight] = useState(-1);
@@ -73,12 +77,10 @@ export function SummonerSearchPanel({
   }, [initialSummonerInput]);
 
   useEffect(() => {
-    if (initialStartDate) setStartDate(initialStartDate);
-  }, [initialStartDate]);
-
-  useEffect(() => {
-    if (initialEndDate) setEndDate(initialEndDate);
-  }, [initialEndDate]);
+    const n = normalizeSummaryDateRange(initialStartDate ?? today, initialEndDate ?? today);
+    setStartDate(n.start);
+    setEndDate(n.end);
+  }, [initialStartDate, initialEndDate, today]);
 
   const runSearch = (names: string[]) => {
     if (names.length === 0) {
