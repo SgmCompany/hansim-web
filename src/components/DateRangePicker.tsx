@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatDateToInput, getDaysDifference, getToday } from '@/src/utils/date';
 
 function dateStrToday(): string {
@@ -15,6 +15,40 @@ function minDateStr(a: string, b: string): string {
 /** 달력에서 선택 가능한 마지막 날(오늘) */
 function isDateAfterToday(date: Date): boolean {
   return formatDateToInput(date) > dateStrToday();
+}
+
+/** 검색 기간 시작일이 속한 연·월로 캘린더 뷰 초기값 (모달 재오픈 시에도 현재 선택 기간 반영) */
+function initialCalendarViewFromStart(startDate: string): { year: number; month: number } {
+  const today = getToday();
+  const maxCalendarYear = today.getFullYear();
+  const minCalendarYear = Math.max(2015, maxCalendarYear - 15);
+
+  const maxMonthIndexForYear = (year: number): number =>
+    year === maxCalendarYear ? today.getMonth() : 11;
+
+  const parsed = /^(\d{4})-(\d{2})-\d{2}$/.exec(startDate.trim());
+  if (!parsed) {
+    return { year: maxCalendarYear, month: today.getMonth() };
+  }
+
+  let year = Number(parsed[1]);
+  let month = Number(parsed[2]) - 1;
+
+  if (year < minCalendarYear) {
+    return { year: minCalendarYear, month: 0 };
+  }
+  if (year > maxCalendarYear) {
+    return {
+      year: maxCalendarYear,
+      month: maxMonthIndexForYear(maxCalendarYear),
+    };
+  }
+
+  const cap = maxMonthIndexForYear(year);
+  if (month > cap) {
+    return { year, month: cap };
+  }
+  return { year, month };
 }
 
 type DateRangePickerProps = {
@@ -34,11 +68,35 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   const [selectingStart, setSelectingStart] = useState(true);
 
-  // 현재 보여지는 월/년
-  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
-  const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => initialCalendarViewFromStart(startDate).month);
+  const [viewYear, setViewYear] = useState(() => initialCalendarViewFromStart(startDate).year);
+
+  const today = getToday();
+  const maxCalendarYear = today.getFullYear();
+  const minCalendarYear = Math.max(2015, maxCalendarYear - 15);
+
+  const maxMonthIndexForYear = (year: number): number =>
+    year === maxCalendarYear ? today.getMonth() : 11;
+
+  const yearOptions = useMemo(
+    () =>
+      Array.from(
+        { length: maxCalendarYear - minCalendarYear + 1 },
+        (_, i) => minCalendarYear + i,
+      ),
+    [maxCalendarYear, minCalendarYear],
+  );
+
+  useEffect(() => {
+    const cap = maxMonthIndexForYear(viewYear);
+    setViewMonth((m) => (m > cap ? cap : m));
+  }, [viewYear]);
+
+  const canGoToPrevMonth = (): boolean =>
+    !(viewYear === minCalendarYear && viewMonth === 0);
 
   const goToPrevMonth = () => {
+    if (!canGoToPrevMonth()) return;
     if (viewMonth === 0) {
       setViewMonth(11);
       setViewYear(viewYear - 1);
@@ -49,7 +107,6 @@ export function DateRangePicker({
 
   const canGoToNextMonth = (): boolean => {
     const firstOfMonthAfterView = new Date(viewYear, viewMonth + 1, 1);
-    const today = getToday();
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     return firstOfMonthAfterView <= todayStart;
   };
@@ -65,9 +122,20 @@ export function DateRangePicker({
   };
 
   const goToToday = () => {
-    const today = new Date();
     setViewMonth(today.getMonth());
     setViewYear(today.getFullYear());
+  };
+
+  const handleYearChange = (nextYear: number) => {
+    const cap = maxMonthIndexForYear(nextYear);
+    setViewYear(nextYear);
+    if (viewMonth > cap) {
+      setViewMonth(cap);
+    }
+  };
+
+  const handleMonthChange = (nextMonth: number) => {
+    setViewMonth(nextMonth);
   };
 
   const handleDateClick = (dateStr: string) => {
@@ -198,45 +266,81 @@ export function DateRangePicker({
     '12월',
   ];
 
-  return (
-    <div className="bg-surface-container-low rounded-sm sm:rounded-md p-4 max-w-[min(100%,17.5rem)] mx-auto">
-      {/* 월 네비게이션 */}
-      <div className="flex items-center justify-between mb-2 gap-1">
-        <button
-          type="button"
-          onClick={goToPrevMonth}
-          className="p-1 hover:bg-surface-container rounded-sm transition-colors shrink-0"
-          aria-label="이전 달"
-        >
-          <span className="material-symbols-outlined text-[1.125rem] leading-none">
-            chevron_left
-          </span>
-        </button>
+  const viewMonthCap = maxMonthIndexForYear(viewYear);
+  const monthIndicesForViewYear = Array.from({ length: viewMonthCap + 1 }, (_, i) => i);
+  const monthSelectValue = Math.min(viewMonth, viewMonthCap);
 
-        <div className="flex items-center gap-1 min-w-0 justify-center">
+  const selectBaseClass =
+    'max-w-[min(48%,9.5rem)] min-w-0 shrink rounded-sm border border-outline-variant/35 bg-surface-container py-1.5 pl-2 pr-1.5 text-xs sm:text-sm font-black text-on-surface cursor-pointer hover:border-primary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-colors';
+
+  return (
+    <div className="bg-surface-container-low rounded-sm sm:rounded-md p-4 max-w-[min(100%,21rem)] mx-auto">
+      {/* 연·월 빠른 이동 + 월 단위 네비게이션 */}
+      <div className="flex flex-col gap-2 mb-2">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+          <button
+            type="button"
+            onClick={goToPrevMonth}
+            disabled={!canGoToPrevMonth()}
+            className="p-1.5 rounded-sm transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-surface-container"
+            aria-label="이전 달"
+          >
+            <span className="material-symbols-outlined text-[1.125rem] leading-none">chevron_left</span>
+          </button>
+
+          <label className="sr-only" htmlFor="date-picker-year">
+            연도 선택
+          </label>
+          <select
+            id="date-picker-year"
+            value={viewYear}
+            onChange={(e) => handleYearChange(Number(e.target.value))}
+            className={`${selectBaseClass} tabular-nums`}
+            aria-label="연도 선택"
+          >
+            {yearOptions.map((y) => (
+              <option key={y} value={y}>
+                {y}년
+              </option>
+            ))}
+          </select>
+
+          <label className="sr-only" htmlFor="date-picker-month">
+            월 선택
+          </label>
+          <select
+            id="date-picker-month"
+            value={monthSelectValue}
+            onChange={(e) => handleMonthChange(Number(e.target.value))}
+            className={selectBaseClass}
+            aria-label="월 선택"
+          >
+            {monthIndicesForViewYear.map((m) => (
+              <option key={m} value={m}>
+                {monthNames[m]}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            onClick={goToNextMonth}
+            disabled={!canGoToNextMonth()}
+            className="p-1.5 rounded-sm transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-surface-container enabled:cursor-pointer"
+            aria-label="다음 달"
+          >
+            <span className="material-symbols-outlined text-[1.125rem] leading-none">chevron_right</span>
+          </button>
+        </div>
+        <div className="flex justify-center">
           <button
             type="button"
             onClick={goToToday}
-            className="px-2 py-0.5 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 rounded-sm transition-colors shrink-0"
+            className="px-3 py-1 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 rounded-sm transition-colors"
           >
-            오늘
+            이번 달(오늘)로 이동
           </button>
-          <span className="text-sm font-black text-on-surface truncate">
-            {viewYear}년 {monthNames[viewMonth]}
-          </span>
         </div>
-
-        <button
-          type="button"
-          onClick={goToNextMonth}
-          disabled={!canGoToNextMonth()}
-          className="p-1 rounded-sm transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent hover:bg-surface-container enabled:cursor-pointer"
-          aria-label="다음 달"
-        >
-          <span className="material-symbols-outlined text-[1.125rem] leading-none">
-            chevron_right
-          </span>
-        </button>
       </div>
 
       {/* 선택 모드 표시 */}
