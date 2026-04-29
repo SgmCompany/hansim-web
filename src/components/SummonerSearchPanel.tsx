@@ -210,7 +210,7 @@ export function SummonerSearchPanel({
           role="dialog"
           aria-modal="true"
           aria-labelledby={dialogTitleId}
-          className="relative z-[1] w-full max-w-sm max-h-[min(90dvh,100svh)] overflow-y-auto overscroll-y-contain touch-pan-y rounded-[1.75rem] sm:rounded-[2rem] bg-surface-container-lowest p-5 sm:p-6 shadow-2xl no-line-boundary animate-in fade-in zoom-in-95 duration-200"
+          className="relative z-[1] w-full max-w-sm max-h-[min(90dvh,100svh)] overflow-y-auto overscroll-y-contain touch-pan-y rounded-sm sm:rounded-md bg-surface-container-lowest p-5 sm:p-6 shadow-2xl no-line-boundary animate-in fade-in zoom-in-95 duration-200"
         >
           <div className="flex items-start justify-between gap-3 mb-4">
             <h2
@@ -222,7 +222,7 @@ export function SummonerSearchPanel({
             <button
               type="button"
               onClick={() => setShowDatePicker(false)}
-              className="shrink-0 p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors"
+              className="shrink-0 p-2 rounded-md hover:bg-surface-container text-on-surface-variant transition-colors"
               aria-label="닫기"
             >
               <span className="material-symbols-outlined text-xl leading-none">close</span>
@@ -247,7 +247,7 @@ export function SummonerSearchPanel({
           <button
             type="button"
             onClick={() => setShowDatePicker(false)}
-            className="mt-5 w-full min-h-12 py-3.5 rounded-full bg-primary text-white font-bold text-sm sm:text-base shadow-md hover:opacity-95 active:scale-[0.98] transition-all"
+            className="mt-5 w-full min-h-12 py-3.5 rounded-md bg-primary text-white font-bold text-sm sm:text-base shadow-md hover:opacity-95 active:scale-[0.98] transition-all"
           >
             확인
           </button>
@@ -258,7 +258,7 @@ export function SummonerSearchPanel({
 
   return (
     <div className={`w-full min-w-0 ${className}`}>
-      <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-xl sm:rounded-2xl no-line-boundary flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch">
+      <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-sm sm:rounded-md no-line-boundary flex flex-col md:flex-row gap-3 sm:gap-4 items-stretch">
         <div className="flex-grow relative w-full min-w-0 z-10">
           <span className="material-symbols-outlined absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-outline text-xl sm:text-2xl pointer-events-none z-10">
             search
@@ -284,14 +284,14 @@ export function SummonerSearchPanel({
               window.setTimeout(() => setInputFocused(false), 160);
             }}
             placeholder={`닉네임 또는 닉네임#태그 (미입력 시 #${DEFAULT_RIOT_TAGLINE})`}
-            className="relative z-10 w-full pl-11 sm:pl-6 pr-4 sm:pr-6 py-4 sm:py-6 bg-surface-container rounded-full border-none focus:ring-4 focus:ring-primary-container text-base sm:text-lg md:text-xl font-semibold placeholder:text-outline-variant outline-none min-w-0"
+            className="relative z-10 w-full pl-11 sm:pl-6 pr-4 sm:pr-6 py-4 sm:py-6 bg-surface-container rounded-md sm:rounded-lg border-none focus:ring-4 focus:ring-primary-container text-base sm:text-lg md:text-xl font-semibold placeholder:text-outline-variant outline-none min-w-0"
           />
           {showSuggestionList && (
             <ul
               id={suggestionListId}
               role="listbox"
               aria-label="최근 검색에서 추천"
-              className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-20 max-h-56 overflow-y-auto rounded-xl sm:rounded-2xl bg-surface-container-lowest py-2 shadow-xl no-line-boundary ring-1 ring-outline-variant/15"
+              className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-20 max-h-56 overflow-y-auto rounded-sm sm:rounded-md bg-surface-container-lowest py-2 shadow-xl no-line-boundary ring-1 ring-outline-variant/15"
               onMouseDown={(e) => e.preventDefault()}
             >
               {suggestions.map((riotId, i) => (
@@ -328,7 +328,7 @@ export function SummonerSearchPanel({
           aria-expanded={showDatePicker}
           aria-haspopup="dialog"
           aria-controls={dialogId}
-          className="min-h-[3.25rem] sm:min-h-14 w-full md:w-auto md:min-w-[17.5rem] lg:min-w-[19rem] md:shrink-0 flex items-center gap-2 px-4 sm:px-5 md:px-6 py-4 sm:py-6 bg-surface-container hover:bg-surface-container-high transition-colors rounded-full text-on-surface-variant font-bold active:scale-[0.98]"
+          className="min-h-[3.25rem] sm:min-h-14 w-full md:w-auto md:min-w-[17.5rem] lg:min-w-[19rem] md:shrink-0 flex items-center gap-2 px-4 sm:px-5 md:px-6 py-4 sm:py-6 bg-surface-container hover:bg-surface-container-high transition-colors rounded-md sm:rounded-lg text-on-surface-variant font-bold active:scale-[0.98]"
         >
           <span className="material-symbols-outlined shrink-0 text-xl">calendar_today</span>
           <span className="min-w-0 flex-1 truncate text-left text-sm sm:text-base md:text-lg">
@@ -344,7 +344,7 @@ export function SummonerSearchPanel({
         <button
           type="button"
           onClick={handleSearch}
-          className="w-full md:w-auto min-h-[3.25rem] p-4 sm:p-6 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 flex items-center justify-center"
+          className="w-full md:w-auto min-h-[3.25rem] p-4 sm:p-6 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-md sm:rounded-lg shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 flex items-center justify-center"
           aria-label="검색"
         >
           <span className="material-symbols-outlined text-2xl sm:text-3xl">search</span>
@@ -360,7 +360,7 @@ export function SummonerSearchPanel({
             {recentItems.map((riotId, i) => (
               <div
                 key={`recent-${riotId}-${i}`}
-                className="snap-start shrink-0 inline-flex items-center gap-0.5 max-w-[min(100%,16rem)] rounded-full bg-surface-container pl-3.5 pr-1 py-1.5 shadow-sm"
+                className="snap-start shrink-0 inline-flex items-center gap-0.5 max-w-[min(100%,16rem)] rounded-lg bg-surface-container pl-3.5 pr-1 py-1.5 shadow-sm"
               >
                 <button
                   type="button"
@@ -376,7 +376,7 @@ export function SummonerSearchPanel({
                     e.stopPropagation();
                     removeRecent(riotId);
                   }}
-                  className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+                  className="shrink-0 flex h-8 w-8 items-center justify-center rounded-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
                   aria-label={`${riotId} 최근 검색에서 삭제`}
                 >
                   <span className="material-symbols-outlined text-lg leading-none" aria-hidden>

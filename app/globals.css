@@ -103,10 +103,10 @@ body {
 
 /*
  * Prototype: summoner-detail.html — TweaksPanel compact preset
- * (--card-roundness: 12px, --stat-density: 0.7, data-emphasis="subtle")
+ * (--card-roundness: …px, --stat-density: 0.7, data-emphasis="subtle")
  */
 [data-layout='summoner-compact'] {
-  --card-roundness: 12px;
+  --card-roundness: 4px;
   /* 패딩·간격: 너무 낮으면 통계 카드·멀티킬 영역 텍스트가 밀림 */
   --stat-density: 0.88;
 }

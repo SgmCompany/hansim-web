@@ -36,7 +36,7 @@ function TierRowDesktop({ row }: { row: HlsTierDef }) {
 
 function TierCardMobile({ row }: { row: HlsTierDef }) {
   return (
-    <div className="rounded-lg border border-outline-variant/15 bg-surface-container/40 p-3 sm:p-4">
+    <div className="rounded-sm border border-outline-variant/15 bg-surface-container/40 p-3 sm:p-4">
       <div className="flex items-baseline justify-between gap-2 mb-1.5">
         <span className="font-black tabular-nums text-on-surface">{formatHlsScoreRange(row)}</span>
         <span className="text-xl shrink-0" aria-hidden>
@@ -54,7 +54,7 @@ function HlsDataSignalsBlock({ dense }: { dense?: boolean }) {
 
   return (
     <section
-      className={`rounded-lg border border-outline-variant/15 bg-surface-container/35 ${dense ? 'p-3 sm:p-4 mb-0' : 'p-4 sm:p-5 mb-0'}`}
+      className={`rounded-sm border border-outline-variant/15 bg-surface-container/35 ${dense ? 'p-3 sm:p-4 mb-0' : 'p-4 sm:p-5 mb-0'}`}
       aria-labelledby="hls-data-signals-heading"
     >
       <h4
@@ -98,7 +98,7 @@ export function HlsTierTable({
   if (variant === 'sidebar') {
     return (
       <div
-        className={`rounded-xl border border-outline-variant/15 bg-surface-container-lowest p-3 shadow-sm ${className}`.trim()}
+        className={`rounded-sm border border-outline-variant/15 bg-surface-container-lowest p-3 shadow-sm ${className}`.trim()}
         role="region"
         aria-labelledby="hls-sidebar-heading"
       >
@@ -111,7 +111,7 @@ export function HlsTierTable({
         <p className="text-[0.6rem] text-on-surface-variant leading-snug mb-2.5">
           0~100 · 높을수록 한심↑ — 행에 포인터를 올리면 멘트 예시를 볼 수 있어요.
         </p>
-        <div className="rounded-md border border-outline-variant/20 overflow-hidden max-h-[min(70vh,28rem)] overflow-y-auto overscroll-y-contain">
+        <div className="rounded-sm border border-outline-variant/20 overflow-hidden max-h-[min(70vh,28rem)] overflow-y-auto overscroll-y-contain">
           <table className="w-full text-[0.65rem] text-left border-collapse">
             <caption className="sr-only">HLS 구간별 등급 요약</caption>
             <thead>
@@ -153,18 +153,18 @@ export function HlsTierTable({
     <>
       {variant === 'full' ? (
         <>
-          <div className="hidden md:block overflow-x-auto rounded-lg border border-outline-variant/20">
+          <div className="hidden md:block overflow-x-auto rounded-sm border border-outline-variant/20">
             <table className="w-full min-w-md text-left border-collapse">
               <caption className="sr-only">한심지수 HLS 점수 구간별 등급과 멘트</caption>
               <thead>
                 <tr className="bg-surface-container-high/80 text-[0.65rem] sm:text-xs font-bold text-on-surface-variant uppercase tracking-wide">
-                  <th scope="col" className="py-2.5 px-3 rounded-tl-lg w-26">
+                  <th scope="col" className="py-2.5 px-3 rounded-tl-sm w-26">
                     HLS
                   </th>
                   <th scope="col" className="py-2.5 px-3 w-36">
                     등급
                   </th>
-                  <th scope="col" className="py-2.5 px-3 rounded-tr-lg">
+                  <th scope="col" className="py-2.5 px-3 rounded-tr-sm">
                     멘트 예시
                   </th>
                 </tr>
@@ -243,7 +243,7 @@ export function HlsTierTable({
   const shell =
     variant === 'full' ? (
       <div
-        className={`w-full max-w-4xl mx-auto rounded-xl border border-outline-variant/15 bg-surface-container-lowest p-4 sm:p-6 lg:p-8 shadow-sm no-line-boundary ${className}`.trim()}
+        className={`w-full max-w-4xl mx-auto rounded-sm border border-outline-variant/15 bg-surface-container-lowest p-4 sm:p-6 lg:p-8 shadow-sm no-line-boundary ${className}`.trim()}
       >
         {intro}
         {tierTable}
@@ -255,9 +255,9 @@ export function HlsTierTable({
       <details
         open={detailsOpen}
         onToggle={(e) => setDetailsOpen(e.currentTarget.open)}
-        className={`group rounded-lg border border-outline-variant/20 bg-surface-container-low/80 no-line-boundary ${className}`.trim()}
+        className={`group rounded-sm border border-outline-variant/20 bg-surface-container-low/80 no-line-boundary ${className}`.trim()}
       >
-        <summary className="list-none cursor-pointer flex items-center justify-between gap-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base font-black text-on-surface hover:bg-surface-container/40 rounded-lg transition-colors [&::-webkit-details-marker]:hidden">
+        <summary className="list-none cursor-pointer flex items-center justify-between gap-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base font-black text-on-surface hover:bg-surface-container/40 rounded-sm transition-colors [&::-webkit-details-marker]:hidden">
           <span className="inline-flex items-center gap-2 min-w-0">
             <span aria-hidden>📊</span>
             <span className="truncate">한심지수(HLS) 등급·데이터 기준</span>
@@ -278,7 +278,7 @@ export function HlsTierTable({
       </details>
     ) : (
       <div
-        className={`rounded-lg border border-outline-variant/20 bg-surface-container-low/80 px-3 py-2.5 sm:px-4 sm:py-3 no-line-boundary ${className}`.trim()}
+        className={`rounded-sm border border-outline-variant/20 bg-surface-container-low/80 px-3 py-2.5 sm:px-4 sm:py-3 no-line-boundary ${className}`.trim()}
       >
         <p className="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-wide mb-2">
           HLS 등급 기준

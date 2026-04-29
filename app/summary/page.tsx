@@ -111,7 +111,7 @@ function ResultContent() {
           <button
             type="button"
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+            className="px-6 py-3 bg-primary text-on-primary rounded-sm font-bold hover:scale-105 transition-all"
           >
             홈으로
           </button>
@@ -133,7 +133,7 @@ function ResultContent() {
           <button
             type="button"
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+            className="px-6 py-3 bg-primary text-on-primary rounded-sm font-bold hover:scale-105 transition-all"
           >
             홈으로
           </button>
@@ -166,7 +166,7 @@ function ResultContent() {
           </p>
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+            className="px-6 py-3 bg-primary text-on-primary rounded-sm font-bold hover:scale-105 transition-all"
           >
             돌아가기
           </button>
@@ -184,7 +184,7 @@ function ResultContent() {
           <p className="text-on-surface-variant mb-6">소환사명을 확인하고 다시 시도해주세요.</p>
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+            className="px-6 py-3 bg-primary text-on-primary rounded-sm font-bold hover:scale-105 transition-all"
           >
             돌아가기
           </button>
@@ -211,7 +211,7 @@ function ResultContent() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="summary-edit-search-title"
-          className="relative z-[1] w-full max-w-4xl max-h-[min(92dvh,100svh)] overflow-y-auto overscroll-y-contain touch-pan-y rounded-[1.75rem] sm:rounded-[2rem] bg-surface-container-lowest p-5 sm:p-6 shadow-2xl no-line-boundary"
+          className="relative z-[1] w-full max-w-4xl max-h-[min(92dvh,100svh)] overflow-y-auto overscroll-y-contain touch-pan-y rounded-sm sm:rounded-md bg-surface-container-lowest p-5 sm:p-6 shadow-2xl no-line-boundary"
         >
           <div className="flex items-start justify-between gap-3 mb-4">
             <h2
@@ -250,7 +250,7 @@ function ResultContent() {
       <button
         type="button"
         onClick={() => setEditSearchOpen(true)}
-        className="w-full min-w-0 text-left bg-surface-container-lowest px-3 py-2.5 sm:px-5 sm:py-3.5 rounded-2xl sm:rounded-3xl no-line-boundary border-2 border-transparent hover:border-primary/25 active:scale-[0.99] transition-all cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-container"
+        className="w-full min-w-0 text-left bg-surface-container-lowest px-3 py-2.5 sm:px-5 sm:py-3.5 rounded-sm sm:rounded-md no-line-boundary border-2 border-transparent hover:border-primary/25 active:scale-[0.99] transition-all cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-container"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-0.5 sm:gap-2 text-center">
           <p className="text-on-surface-variant font-semibold text-xs sm:text-sm wrap-break-word leading-snug inline-flex flex-wrap items-center justify-center gap-1.5">
@@ -289,10 +289,10 @@ function PlayerCard({ player, playerIndex }: { player: Player; playerIndex: numb
   };
 
   return (
-    <article className="bg-surface-container-lowest p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl no-line-boundary w-full min-w-0 overflow-x-clip flex flex-col gap-4 sm:gap-5">
+    <article className="bg-surface-container-lowest p-3 sm:p-5 lg:p-6 rounded-sm sm:rounded-md no-line-boundary w-full min-w-0 overflow-x-clip flex flex-col gap-4 sm:gap-5">
       <header className="flex flex-row md:grid md:grid-cols-[auto_1fr] md:gap-6 md:items-start gap-3 sm:gap-5 pb-4 border-b border-outline-variant/20">
         <div className="relative shrink-0">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-surface-container overflow-hidden">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-sm bg-surface-container overflow-hidden">
             <img
               src={getProfileIconUrl(player.profileIconId, version)}
               alt="Profile"
@@ -394,7 +394,7 @@ function QueueStats({
   if (!queue || queue.games === 0) {
     return (
       <div
-        className={`bg-surface-container p-4 sm:p-5 rounded-2xl h-full min-h-[10rem] flex flex-col ${className}`.trim()}
+        className={`bg-surface-container p-4 sm:p-5 rounded-sm h-full min-h-[10rem] flex flex-col ${className}`.trim()}
       >
         <h3 className="text-[0.7rem] font-bold text-on-surface-variant mb-3 tracking-wide">{title}</h3>
         <div className="flex flex-col items-center justify-center flex-1 py-4">
@@ -410,7 +410,7 @@ function QueueStats({
   const winRate = ((queue.win / queue.games) * 100).toFixed(1);
 
   return (
-    <div className={`bg-surface-container p-4 sm:p-5 rounded-2xl h-full min-h-0 flex flex-col ${className}`.trim()}>
+    <div className={`bg-surface-container p-4 sm:p-5 rounded-sm h-full min-h-0 flex flex-col ${className}`.trim()}>
       <h3 className="text-[0.7rem] font-bold text-on-surface-variant mb-3 tracking-wide shrink-0">{title}</h3>
       <div className="space-y-2 flex-1 min-h-0">
         <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">

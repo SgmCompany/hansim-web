@@ -102,7 +102,7 @@ function SummonerContent({ name }: { name: string }) {
           </p>
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+            className="px-6 py-3 bg-primary text-on-primary rounded-sm font-bold hover:scale-105 transition-all"
           >
             돌아가기
           </button>
@@ -122,7 +122,7 @@ function SummonerContent({ name }: { name: string }) {
           </p>
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-primary text-on-primary rounded-full font-bold hover:scale-105 transition-all"
+            className="px-6 py-3 bg-primary text-on-primary rounded-sm font-bold hover:scale-105 transition-all"
           >
             돌아가기
           </button>
@@ -158,7 +158,7 @@ function SummonerContent({ name }: { name: string }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="summoner-detail-edit-search-title"
-          className="relative z-[1] w-full max-w-4xl max-h-[min(92dvh,100svh)] overflow-y-auto overscroll-y-contain touch-pan-y rounded-[1.75rem] sm:rounded-[2rem] bg-surface-container-lowest p-5 sm:p-6 shadow-2xl no-line-boundary"
+          className="relative z-[1] w-full max-w-4xl max-h-[min(92dvh,100svh)] overflow-y-auto overscroll-y-contain touch-pan-y rounded-sm sm:rounded-md bg-surface-container-lowest p-5 sm:p-6 shadow-2xl no-line-boundary"
         >
           <div className="flex items-start justify-between gap-3 mb-4">
             <h2
@@ -231,7 +231,7 @@ function SummonerContent({ name }: { name: string }) {
       <button
         type="button"
         onClick={() => setEditSearchOpen(true)}
-        className="w-full text-left bg-surface-container-lowest px-3 py-2.5 sm:px-5 sm:py-3.5 rounded-2xl sm:rounded-3xl no-line-boundary border-2 border-transparent hover:border-primary/25 active:scale-[0.99] transition-all cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-container"
+        className="w-full text-left bg-surface-container-lowest px-3 py-2.5 sm:px-5 sm:py-3.5 rounded-sm sm:rounded-md no-line-boundary border-2 border-transparent hover:border-primary/25 active:scale-[0.99] transition-all cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-container"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-0.5 sm:gap-2 text-center">
           <p className="text-on-surface-variant font-semibold text-xs sm:text-sm wrap-break-word leading-snug inline-flex flex-wrap items-center justify-center gap-1.5">
