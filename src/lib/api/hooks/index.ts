@@ -3,6 +3,7 @@
  */
 
 export * from './useAuth';
+export * from './useMe';
 export * from './useSummoner';
 export * from './useLeaderboard';
 export * from './useSummary';

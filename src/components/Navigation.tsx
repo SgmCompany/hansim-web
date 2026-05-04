@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { logout } from '@/src/lib/auth/logout';
 
 type NavigationProps = {
   isHomePage?: boolean;
@@ -36,18 +35,17 @@ export function Navigation({ isHomePage = false }: NavigationProps) {
             {status === 'loading' ? (
               <div className="w-10 h-10 rounded-full bg-surface-container animate-pulse shrink-0" />
             ) : session ? (
-              <div className="flex items-center gap-1 sm:gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="min-h-11 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold text-on-surface-variant rounded-full transition-all duration-200 hover:bg-surface-container-high hover:text-primary hover:shadow-[inset_0_0_0_1px_rgba(0,106,53,0.12)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container focus-visible:ring-offset-2"
+              <div className="flex items-center gap-1 sm:gap-3 shrink-0 flex-wrap justify-end">
+                <Link
+                  href="/account"
+                  className="min-h-11 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold text-primary rounded-full transition-all duration-200 hover:bg-primary-container/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container focus-visible:ring-offset-2"
                 >
-                  로그아웃
-                </button>
-                <button
-                  type="button"
+                  마이페이지
+                </Link>
+                <Link
+                  href="/account"
                   className="group min-h-11 min-w-11 p-2 rounded-full transition-all duration-200 flex items-center justify-center hover:bg-primary-container/55 hover:shadow-[0_6px_24px_-8px_rgba(0,106,53,0.45)] hover:ring-2 hover:ring-primary/20 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  aria-label="계정"
+                  aria-label="계정 설정(마이페이지)"
                 >
                   {session.user?.image ? (
                     <img
@@ -62,7 +60,7 @@ export function Navigation({ isHomePage = false }: NavigationProps) {
                       account_circle
                     </span>
                   )}
-                </button>
+                </Link>
               </div>
             ) : (
               <Link

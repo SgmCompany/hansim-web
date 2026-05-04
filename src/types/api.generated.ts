@@ -4,6 +4,30 @@
  */
 
 export interface paths {
+    "/api/v1/users/me/summoner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 소환사 연동/변경
+         * @description Riot ID를 검증한 뒤 내 계정에 연동합니다. 이미 연동된 경우 변경됩니다.
+         */
+        put: operations["linkSummoner"];
+        post?: never;
+        /**
+         * 소환사 연동 해제
+         * @description 연동된 소환사 정보를 삭제합니다.
+         */
+        delete: operations["unlinkSummoner"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hansim/summary/batch": {
         parameters: {
             query?: never;
@@ -60,6 +84,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 내 프로필 조회
+         * @description 로그인한 유저의 프로필과 소환사 연동 정보를 반환합니다.
+         */
+        get: operations["getMyProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hansim/summary/{riotId}": {
         parameters: {
             query?: never;
@@ -104,6 +148,19 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description 소환사 연동 요청 */
+        LinkSummonerRequest: {
+            /**
+             * @description Riot 게임 이름
+             * @example 페이커
+             */
+            gameName: string;
+            /**
+             * @description Riot 태그라인 (# 제외)
+             * @example KR1
+             */
+            tagLine: string;
+        };
         /** @description 다중 소환사 한심 지수 조회 요청 */
         BatchSummaryRequest: {
             /**
@@ -445,6 +502,35 @@ export interface components {
             /** @description JWT access token. 유효기간 7일 */
             accessToken: string;
         };
+        /** @description 내 프로필 응답 */
+        MyProfileResponse: {
+            /**
+             * Format: int64
+             * @description 유저 ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 이메일
+             * @example user@gmail.com
+             */
+            email: string;
+            /** @description 연동된 소환사 정보. 미연동 시 null */
+            summoner?: components["schemas"]["SummonerInfo"];
+        };
+        /** @description 연동된 소환사 정보 */
+        SummonerInfo: {
+            /**
+             * @description Riot 게임 이름
+             * @example 페이커
+             */
+            gameName: string;
+            /**
+             * @description Riot 태그라인
+             * @example KR1
+             */
+            tagLine: string;
+        };
         /** @description 한심 summary 조회 쿼리 파라미터 */
         SummaryRequestQuery: {
             /**
@@ -481,6 +567,46 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    linkSummoner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkSummonerRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    unlinkSummoner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getBatchSummary: {
         parameters: {
             query?: never;
@@ -545,6 +671,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": string;
+                };
+            };
+        };
+    };
+    getMyProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MyProfileResponse"];
                 };
             };
         };

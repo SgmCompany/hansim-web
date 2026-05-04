@@ -3,13 +3,29 @@
  * 백엔드 API와 통신하기 위한 기본 설정
  */
 
+import { HANSIM_ACCESS_TOKEN_KEY } from '@/src/lib/auth/accessTokenStorage';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 if (!API_BASE_URL && typeof window !== 'undefined') {
-  console.warn('NEXT_PUBLIC_API_BASE_URL is not defined, using localhost:8000');
+  console.warn(
+    'NEXT_PUBLIC_API_BASE_URL is not defined, using http://localhost:8080 (openapi servers 기본값과 동일)',
+  );
 }
 
-const BASE_URL = API_BASE_URL || 'http://localhost:8000';
+/** openapi/openapi.json servers 기본값과 맞춤 (sync-api-spec·로컬 백엔드는 8080) */
+const BASE_URL = API_BASE_URL || 'http://localhost:8080';
+
+async function resolveClientBearerToken(): Promise<string | undefined> {
+  const { getSession } = await import('next-auth/react');
+  const session = await getSession();
+  if (session?.accessToken) return session.accessToken;
+  try {
+    return localStorage.getItem(HANSIM_ACCESS_TOKEN_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export class ApiError extends Error {
   constructor(
@@ -63,15 +79,13 @@ export async function apiRequest<T>(endpoint: string, config: ApiRequestConfig =
     ...fetchConfig.headers,
   };
 
-  // 인증 토큰 추가 (클라이언트 사이드에서만)
+  // 인증 토큰 추가 (클라이언트 사이드에서만) — 세션 + localStorage 폴백
   if (typeof window !== 'undefined' && !skipAuth) {
-    const { getSession } = await import('next-auth/react');
-    const session = await getSession();
-
-    if (session?.accessToken) {
+    const bearer = await resolveClientBearerToken();
+    if (bearer) {
       headers = {
         ...headers,
-        Authorization: `Bearer ${session.accessToken}`,
+        Authorization: `Bearer ${bearer}`,
       };
     }
   }
