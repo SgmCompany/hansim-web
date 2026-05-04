@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ApiError } from '@/src/lib/api/client';
+import { useMe, useUpdateProfile } from '@/src/lib/api/hooks/useMe';
+import { buildUpdateProfileRequest } from '@/src/lib/api/services/userService';
 import {
   WORK_TYPE_LABELS,
   WORK_TYPE_OPTIONS,
@@ -12,6 +15,28 @@ import {
 } from '@/src/constants/workProfile';
 
 type Step = 1 | 2 | 3;
+
+function profileUpdateErrorMessage(err: unknown): string {
+  if (err instanceof ApiError) {
+    const data = err.data;
+    const fromBody =
+      data && typeof data === 'object' && 'message' in data && typeof (data as { message: unknown }).message === 'string'
+        ? String((data as { message: string }).message)
+        : null;
+    if (err.status === 401) {
+      return '로그인이 만료되었습니다. 다시 로그인 후 시도해 주세요.';
+    }
+    if (err.status === 400 || err.status === 422) {
+      return fromBody ?? '입력값을 확인해 주세요.';
+    }
+    return fromBody ?? '프로필 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+  }
+  const msg = err instanceof Error ? err.message : '';
+  if (/Network error|Failed to fetch|fetch|Load failed|network/i.test(msg)) {
+    return '서버에 연결할 수 없습니다. 네트워크와 API 주소를 확인해 주세요.';
+  }
+  return '프로필 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+}
 
 function formatThousands(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -28,12 +53,16 @@ function parseDigits(display: string): number | null {
 export function WorkProfileOnboarding() {
   const router = useRouter();
   const { status } = useSession();
+  const { data: me, isLoading: meLoading, isError: meError } = useMe();
+  const updateProfile = useUpdateProfile();
 
   const [step, setStep] = useState<Step>(1);
   const [selectedType, setSelectedType] = useState<WorkTypeId | null>(null);
   const [incomeKind, setIncomeKind] = useState<IncomeInputKind>('SALARY');
   const [incomeDisplay, setIncomeDisplay] = useState('');
   const [summaryIncome, setSummaryIncome] = useState<number | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const serverHydratedRef = useRef(false);
 
   const selectedOption = useMemo(
     () => WORK_TYPE_OPTIONS.find((o) => o.id === selectedType) ?? null,
@@ -81,7 +110,16 @@ export function WorkProfileOnboarding() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [step]);
 
-  if (status === 'loading') {
+  useEffect(() => {
+    if (!me || status !== 'authenticated' || serverHydratedRef.current) return;
+    const wt = me.workType;
+    if (wt != null && WORK_TYPE_OPTIONS.some((o) => o.id === wt)) {
+      setSelectedType(wt);
+    }
+    serverHydratedRef.current = true;
+  }, [me, status]);
+
+  if (status === 'loading' || (status === 'authenticated' && meLoading)) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
         <div className="animate-pulse text-on-surface-variant">로딩 중...</div>
@@ -98,20 +136,40 @@ export function WorkProfileOnboarding() {
 
   const goNextFromType = () => {
     if (!selectedType || !selectedOption) return;
+    setSubmitError(null);
     setIncomeKind(selectedOption.incomeKind);
-    setIncomeDisplay('');
+    if (me?.workType === selectedType) {
+      if (selectedType === 'NINE_TO_SIX' || selectedType === 'FAIR_24H') {
+        const v = me.annualSalary;
+        setIncomeDisplay(v != null ? formatThousands(String(v)) : '');
+      } else if (selectedType === 'PART_TIME') {
+        const v = me.hourlyWage;
+        setIncomeDisplay(v != null ? formatThousands(String(v)) : '');
+      } else {
+        setIncomeDisplay('');
+      }
+    } else {
+      setIncomeDisplay('');
+    }
     setStep(2);
   };
 
   const goSubmit = async () => {
+    if (!selectedType) return;
+    setSubmitError(null);
     let income: number | null = null;
     if (incomeKind !== 'NONE' && incomeStepCopy.showInput) {
       income = parseDigits(incomeDisplay);
     }
-    setSummaryIncome(income);
+    const body = buildUpdateProfileRequest(selectedType, income);
 
-    // TODO: 백엔드 프로필 API가 준비되면 여기서 저장 (workType, incomeKind, income)
-    setStep(3);
+    try {
+      await updateProfile.mutateAsync(body);
+      setSummaryIncome(income);
+      setStep(3);
+    } catch (err) {
+      setSubmitError(profileUpdateErrorMessage(err));
+    }
   };
 
   const summaryIncomeLabel = incomeKind === 'HOURLY' ? '시급' : '세전 연봉';
@@ -126,6 +184,12 @@ export function WorkProfileOnboarding() {
 
   return (
     <>
+      {meError && (
+        <p className="mb-6 rounded-2xl bg-error-container/15 px-4 py-3 text-sm font-medium text-error">
+          저장된 프로필을 불러오지 못했습니다. 아래에서 다시 설정할 수 있습니다.
+        </p>
+      )}
+
       <div
         className="mb-10 h-1.5 w-full overflow-hidden rounded-full bg-surface-container"
         role="progressbar"
@@ -243,7 +307,8 @@ export function WorkProfileOnboarding() {
                   placeholder={incomeStepCopy.placeholder}
                   value={incomeDisplay}
                   onChange={(e) => setIncomeDisplay(formatThousands(e.target.value))}
-                  className="w-full rounded-full border-2 border-transparent bg-surface-container py-5 pl-6 pr-36 text-lg font-semibold text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-primary focus:bg-surface-container-lowest focus:shadow-[0_0_0_4px_rgba(107,254,156,0.3)]"
+                  disabled={updateProfile.isPending}
+                  className="w-full rounded-full border-2 border-transparent bg-surface-container py-5 pl-6 pr-36 text-lg font-semibold text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-primary focus:bg-surface-container-lowest focus:shadow-[0_0_0_4px_rgba(107,254,156,0.3)] disabled:opacity-50"
                 />
                 <span className="pointer-events-none absolute right-6 text-lg font-bold text-on-surface-variant">
                   {incomeStepCopy.suffix}
@@ -253,22 +318,33 @@ export function WorkProfileOnboarding() {
             </div>
           )}
 
+          {submitError && (
+            <p className="mb-6 text-sm font-medium text-error" role="alert">
+              {submitError}
+            </p>
+          )}
+
           <div className="mt-12 flex flex-col-reverse gap-4 sm:flex-row">
             <button
               type="button"
-              onClick={() => setStep(1)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container px-8 py-5 text-base font-bold text-on-surface transition-colors hover:bg-surface-container-high"
+              onClick={() => {
+                setSubmitError(null);
+                setStep(1);
+              }}
+              disabled={updateProfile.isPending}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container px-8 py-5 text-base font-bold text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-xl">arrow_back</span>
               이전
             </button>
             <button
               type="button"
-              onClick={goSubmit}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-dim px-8 py-5 text-base font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.03] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98]"
+              onClick={() => void goSubmit()}
+              disabled={updateProfile.isPending}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-dim px-8 py-5 text-base font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.03] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
-              설정 완료
-              <span className="material-symbols-outlined text-xl">check</span>
+              {updateProfile.isPending ? '저장 중...' : '설정 완료'}
+              {!updateProfile.isPending && <span className="material-symbols-outlined text-xl">check</span>}
             </button>
           </div>
         </div>

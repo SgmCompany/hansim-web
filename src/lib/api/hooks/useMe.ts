@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import type { LinkSummonerRequest } from '../services/userService';
+import type { LinkSummonerRequest, UpdateProfileRequest } from '../services/userService';
 import { userKeys } from '../queryKeys';
 import * as userService from '../services/userService';
 
@@ -32,6 +32,17 @@ export function useUnlinkSummoner() {
 
   return useMutation({
     mutationFn: () => userService.unlinkSummoner(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() });
+    },
+  });
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (body: UpdateProfileRequest) => userService.updateProfile(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.me() });
     },

@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { SummonerLinkSection } from '@/src/components/SummonerLinkSection';
 import { Navigation } from '@/src/components/Navigation';
 import { Footer } from '@/src/components/Footer';
+import { useMe } from '@/src/lib/api/hooks/useMe';
+import { WORK_TYPE_LABELS } from '@/src/constants/workProfile';
 import { logout, deleteAccount } from '@/src/lib/auth/logout';
 
 const WITHDRAW_CONFIRM_PHRASE = '협곡 졸업';
@@ -14,6 +16,7 @@ const WITHDRAW_CONFIRM_PHRASE = '협곡 졸업';
 export default function AccountPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { data: me, isLoading: meLoading } = useMe();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [withdrawPhraseInput, setWithdrawPhraseInput] = useState('');
@@ -72,14 +75,44 @@ export default function AccountPage() {
 
         <div className="bg-surface-container-lowest p-5 sm:p-8 lg:p-10 rounded-[2rem] sm:rounded-[3rem] no-line-boundary mb-6">
           <h2 className="text-xl sm:text-2xl font-black tracking-tight mb-2">근무 프로필</h2>
-          <p className="text-on-surface-variant mb-6 leading-relaxed">
+          <p className="text-on-surface-variant mb-4 leading-relaxed">
             근무 형태와 소득 정보를 설정하면 한심지수가 맞춤 방식으로 계산됩니다.
           </p>
+
+          {meLoading ? (
+            <p className="text-sm text-on-surface-variant mb-6 animate-pulse">불러오는 중…</p>
+          ) : me?.workType ? (
+            <div className="mb-6 space-y-2 rounded-2xl bg-surface-container px-4 py-4 text-sm">
+              <p>
+                <span className="text-on-surface-variant">유형 </span>
+                <span className="font-extrabold text-on-surface">{WORK_TYPE_LABELS[me.workType]}</span>
+              </p>
+              {(me.workType === 'NINE_TO_SIX' || me.workType === 'FAIR_24H') && me.annualSalary != null && (
+                <p>
+                  <span className="text-on-surface-variant">세전 연봉 </span>
+                  <span className="font-bold text-on-surface tabular-nums">
+                    {me.annualSalary.toLocaleString('ko-KR')}만원
+                  </span>
+                </p>
+              )}
+              {me.workType === 'PART_TIME' && me.hourlyWage != null && (
+                <p>
+                  <span className="text-on-surface-variant">시급 </span>
+                  <span className="font-bold text-on-surface tabular-nums">
+                    {me.hourlyWage.toLocaleString('ko-KR')}원
+                  </span>
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="text-on-surface-variant mb-6 text-sm">아직 근무 프로필이 없습니다.</p>
+          )}
+
           <Link
             href="/account/work-profile"
             className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-dim px-6 py-3 text-sm font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-transform hover:scale-[1.02] active:scale-[0.98]"
           >
-            근무 프로필 설정
+            {me?.workType ? '근무 프로필 변경' : '근무 프로필 설정'}
             <span className="material-symbols-outlined text-lg" aria-hidden>
               arrow_forward
             </span>
