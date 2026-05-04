@@ -18,14 +18,14 @@ const handler = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google' && account?.id_token) {
+      if (account?.provider === 'google') {
+        if (!account.id_token) {
+          console.error('Google OAuth: id_token이 없습니다. OpenID(scope) 설정을 확인하세요.');
+          return false;
+        }
         try {
-          // 백엔드에 Google ID Token 전송
           const backendAuth = await loginWithGoogle(account.id_token);
-
-          // 백엔드 JWT를 account에 임시 저장 (jwt 콜백에서 사용)
           account.backend_jwt = backendAuth.accessToken;
-
           return true;
         } catch (error) {
           console.error('백엔드 로그인 실패:', error);
@@ -57,8 +57,6 @@ const handler = NextAuth({
       if (account?.id_token) {
         token.googleIdToken = account.id_token;
       }
-      console.log('account:', account?.id_token);
-
       // 백엔드 JWT (실제 API 인증에 사용)
       if (account?.backend_jwt) {
         token.accessToken = account.backend_jwt;

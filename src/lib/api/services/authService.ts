@@ -59,11 +59,8 @@ export async function deleteAccount() {
 /**
  * 현재 사용자 정보 조회
  *
- * Note: 현재 백엔드 API에 이 엔드포인트가 없음
- * NextAuth 세션의 user 정보를 사용하거나, 필요시 백엔드에 추가 요청
+ * 클라이언트: userService.getMe() / useMe() — GET /api/v1/users/me
  */
 export async function getCurrentUser() {
-  // 백엔드 API에 /api/v1/user/me 엔드포인트가 없으므로
-  // NextAuth 세션 정보를 사용
   return null;
 }

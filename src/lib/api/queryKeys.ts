@@ -3,6 +3,11 @@
  * React Query 캐시 키를 체계적으로 관리
  */
 
+export const userKeys = {
+  all: ['user'] as const,
+  me: () => [...userKeys.all, 'me'] as const,
+};
+
 export const summonerKeys = {
   all: ['summoner'] as const,
   lists: () => [...summonerKeys.all, 'list'] as const,

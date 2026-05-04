@@ -3,6 +3,7 @@ import { signOut } from 'next-auth/react';
 import * as authService from '../services/authService';
 
 import type { paths } from '@/src/types/api.generated';
+import { HANSIM_ACCESS_TOKEN_KEY } from '@/src/lib/auth/accessTokenStorage';
 
 /**
  * 백엔드 API 타입
@@ -21,7 +22,7 @@ export function useGoogleAuth() {
     onSuccess: (data: AuthResponse) => {
       // 백엔드에서 받은 JWT를 로컬에 저장
       if (typeof window !== 'undefined') {
-        localStorage.setItem('hansim_access_token', data.accessToken);
+        localStorage.setItem(HANSIM_ACCESS_TOKEN_KEY, data.accessToken);
       }
     },
     onError: (error) => {
