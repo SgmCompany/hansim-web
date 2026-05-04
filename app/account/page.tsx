@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -68,6 +69,22 @@ export default function AccountPage() {
         </h1>
 
         <SummonerLinkSection />
+
+        <div className="bg-surface-container-lowest p-5 sm:p-8 lg:p-10 rounded-[2rem] sm:rounded-[3rem] no-line-boundary mb-6">
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight mb-2">근무 프로필</h2>
+          <p className="text-on-surface-variant mb-6 leading-relaxed">
+            근무 형태와 소득 정보를 설정하면 한심지수가 맞춤 방식으로 계산됩니다.
+          </p>
+          <Link
+            href="/account/work-profile"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-dim px-6 py-3 text-sm font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            근무 프로필 설정
+            <span className="material-symbols-outlined text-lg" aria-hidden>
+              arrow_forward
+            </span>
+          </Link>
+        </div>
 
         <div className="bg-surface-container-lowest p-5 sm:p-8 lg:p-10 rounded-[2rem] sm:rounded-[3rem] no-line-boundary mb-6">
           <h2 className="text-xl sm:text-2xl font-black tracking-tight mb-6">프로필 정보</h2>
