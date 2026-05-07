@@ -20,7 +20,10 @@ function profileUpdateErrorMessage(err: unknown): string {
   if (err instanceof ApiError) {
     const data = err.data;
     const fromBody =
-      data && typeof data === 'object' && 'message' in data && typeof (data as { message: unknown }).message === 'string'
+      data &&
+      typeof data === 'object' &&
+      'message' in data &&
+      typeof (data as { message: unknown }).message === 'string'
         ? String((data as { message: string }).message)
         : null;
     if (err.status === 401) {
@@ -86,7 +89,7 @@ export function WorkProfileOnboarding() {
       return {
         title: '시급을 알려주세요',
         subtitle:
-          '시급 정보는 한심지수의 "경제적 영향도"를 계산하는 데 사용됩니다. 입력하신 정보는 암호화되어 안전하게 보관되며, 통계 목적으로만 사용됩니다.',
+          '시급 정보는 한심지수의 "경제적 영향도"를 계산하는 데 사용됩니다. 통계 목적으로 사용됩니다.',
         showInput: true,
         label: '시급',
         suffix: '원',
@@ -97,7 +100,7 @@ export function WorkProfileOnboarding() {
     return {
       title: '세전 연봉을 알려주세요',
       subtitle:
-        '연봉 정보는 한심지수의 "경제적 영향도"를 계산하는 데 사용됩니다. 입력하신 정보는 암호화되어 안전하게 보관되며, 통계 목적으로만 사용됩니다.',
+        '연봉 정보는 한심지수의 "경제적 영향도"를 계산하는 데 사용됩니다. 통계 목적으로 사용됩니다.',
       showInput: true,
       label: '세전 연봉',
       suffix: '만원',
@@ -185,7 +188,7 @@ export function WorkProfileOnboarding() {
   return (
     <>
       {meError && (
-        <p className="mb-6 rounded-2xl bg-error-container/15 px-4 py-3 text-sm font-medium text-error">
+        <p className="mb-5 rounded-lg bg-error-container/15 px-3 py-2.5 text-sm font-medium text-error">
           저장된 프로필을 불러오지 못했습니다. 아래에서 다시 설정할 수 있습니다.
         </p>
       )}
@@ -205,20 +208,20 @@ export function WorkProfileOnboarding() {
       </div>
 
       {step === 1 && (
-        <div className="no-line-boundary mb-6 rounded-[2rem] bg-surface-container-lowest p-6 shadow-[0_4px_60px_-15px_rgba(0,0,0,0.05)] sm:rounded-[3rem] sm:p-12">
-          <h1 className="mb-4 text-[1.75rem] font-black tracking-tight text-on-surface sm:text-[2rem]">
+        <div className="no-line-boundary mb-6 rounded-xl bg-surface-container-lowest p-5 shadow-[0_4px_60px_-15px_rgba(0,0,0,0.05)] sm:rounded-2xl sm:p-7">
+          <h1 className="mb-3 text-xl font-black tracking-tight text-on-surface sm:text-2xl">
             어떤 근무 형태인가요?
           </h1>
-          <p className="mb-10 text-base leading-relaxed text-on-surface-variant">
-            한심지수는 근무 유형에 따라 다른 알고리즘으로 계산됩니다. 본인의 근무 형태와 가장 가까운 것을
-            선택해주세요.
+          <p className="mb-6 text-sm leading-relaxed text-on-surface-variant sm:text-[0.9375rem]">
+            한심지수는 근무 유형에 따라 다른 알고리즘으로 계산됩니다. 본인의 근무 형태와 가장 가까운
+            것을 선택해주세요.
           </p>
 
-          <div className="mb-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+          <div className="mb-4 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
             근무 유형 선택
           </div>
 
-          <div className="mb-10 flex flex-col gap-4">
+          <div className="mb-8 flex flex-col gap-3">
             {WORK_TYPE_OPTIONS.map((opt) => {
               const selected = selectedType === opt.id;
               return (
@@ -227,49 +230,74 @@ export function WorkProfileOnboarding() {
                   type="button"
                   onClick={() => setSelectedType(opt.id)}
                   className={[
-                    'relative w-full rounded-[2rem] border-[3px] bg-surface-container p-6 text-left transition-all sm:p-8',
-                    'hover:-translate-y-1 hover:shadow-[0_8px_40px_-10px_rgba(0,106,53,0.15)]',
+                    'relative w-full rounded-sm border-2 bg-surface-container p-4 text-left transition-all sm:p-5',
+                    'hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/10',
                     selected
-                      ? 'border-primary bg-primary-container shadow-[0_8px_40px_-10px_rgba(0,106,53,0.25)]'
+                      ? 'border-primary bg-primary-container shadow-md shadow-primary/15'
                       : 'border-transparent',
                   ].join(' ')}
                 >
                   <span
                     className={[
-                      'absolute right-6 top-6 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-on-primary',
+                      'absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-on-primary',
                       selected ? 'flex' : 'hidden',
                     ].join(' ')}
                     aria-hidden
                   >
-                    <span className="material-symbols-outlined text-xl">check</span>
+                    <span className="material-symbols-outlined text-lg">check</span>
                   </span>
-                  <div
-                    className={[
-                      'mb-4 flex h-14 w-14 items-center justify-center rounded-3xl text-[1.75rem]',
-                      selected ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface',
-                    ].join(' ')}
-                  >
-                    <span className="material-symbols-outlined">{opt.icon}</span>
-                  </div>
-                  <div className="mb-2 text-xl font-extrabold text-on-surface">{opt.label}</div>
-                  <div className="mb-3 text-sm text-on-surface-variant">{opt.shortDesc}</div>
-                  <div
-                    className={[
-                      'whitespace-pre-line rounded-2xl px-4 py-3 text-xs leading-snug text-on-surface-variant',
-                      selected ? 'bg-primary/10 font-semibold text-on-primary-container' : 'bg-white/50',
-                    ].join(' ')}
-                  >
-                    {opt.detail}
+                  <div className="flex gap-3">
+                    <div
+                      className={[
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl',
+                        selected
+                          ? 'bg-primary text-on-primary'
+                          : 'bg-surface-container-lowest text-on-surface',
+                      ].join(' ')}
+                    >
+                      <span className="material-symbols-outlined text-[22px]">{opt.icon}</span>
+                    </div>
+                    <div className="min-w-0 flex-1 pr-8">
+                      <div className="text-base font-extrabold leading-tight text-on-surface">
+                        {opt.label}
+                      </div>
+                      <div className="mt-1 text-xs leading-snug text-on-surface-variant sm:text-[13px]">
+                        {opt.shortDesc}
+                      </div>
+                      <dl
+                        className={[
+                          'mt-3 space-y-2 rounded-lg border px-3 py-2 text-[11px] leading-snug sm:text-xs',
+                          selected
+                            ? 'border-primary/20 bg-primary/10 text-on-primary-container'
+                            : 'border-outline-variant/20 bg-surface-container-lowest/80 text-on-surface-variant',
+                        ].join(' ')}
+                      >
+                        <div className="flex gap-2">
+                          <dt className="w-10 shrink-0 font-semibold text-on-surface-variant">
+                            가중치
+                          </dt>
+                          <dd className="min-w-0 font-medium leading-snug text-on-surface">
+                            {opt.weightsLine}
+                          </dd>
+                        </div>
+                        <div className="flex gap-2 border-t border-outline-variant/15 pt-2">
+                          <dt className="w-10 shrink-0 font-semibold text-on-surface-variant">
+                            특징
+                          </dt>
+                          <dd className="min-w-0">{opt.featureShort}</dd>
+                        </div>
+                      </dl>
+                    </div>
                   </div>
                 </button>
               );
             })}
           </div>
 
-          <div className="mt-12 flex flex-col-reverse gap-4 sm:flex-row">
+          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row">
             <Link
               href="/account"
-              className="flex flex-1 items-center justify-center rounded-full bg-surface-container px-8 py-5 text-base font-bold text-on-surface transition-colors hover:bg-surface-container-high"
+              className="flex flex-1 items-center justify-center rounded-xl bg-surface-container px-6 py-3.5 text-sm font-bold text-on-surface transition-colors hover:bg-surface-container-high sm:text-base"
             >
               나중에 설정
             </Link>
@@ -277,25 +305,30 @@ export function WorkProfileOnboarding() {
               type="button"
               disabled={!selectedType}
               onClick={goNextFromType}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-dim px-8 py-5 text-base font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.03] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-6 py-3.5 text-sm font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 sm:text-base"
             >
               다음
-              <span className="material-symbols-outlined text-xl">arrow_forward</span>
+              <span className="material-symbols-outlined text-lg">arrow_forward</span>
             </button>
           </div>
         </div>
       )}
 
       {step === 2 && (
-        <div className="no-line-boundary mb-6 rounded-[2rem] bg-surface-container-lowest p-6 shadow-[0_4px_60px_-15px_rgba(0,0,0,0.05)] sm:rounded-[3rem] sm:p-12">
-          <h1 className="mb-4 text-[1.75rem] font-black tracking-tight text-on-surface sm:text-[2rem]">
+        <div className="no-line-boundary mb-6 rounded-xl bg-surface-container-lowest p-5 shadow-[0_4px_60px_-15px_rgba(0,0,0,0.05)] sm:rounded-2xl sm:p-7">
+          <h1 className="mb-3 text-xl font-black tracking-tight text-on-surface sm:text-2xl">
             {incomeStepCopy.title}
           </h1>
-          <p className="mb-10 text-base leading-relaxed text-on-surface-variant">{incomeStepCopy.subtitle}</p>
+          <p className="mb-6 text-sm leading-relaxed text-on-surface-variant sm:text-[0.9375rem]">
+            {incomeStepCopy.subtitle}
+          </p>
 
           {incomeStepCopy.showInput && (
-            <div className="mb-10">
-              <label htmlFor="work-profile-income" className="mb-3 block text-sm font-bold text-on-surface">
+            <div className="mb-8">
+              <label
+                htmlFor="work-profile-income"
+                className="mb-2 block text-sm font-bold text-on-surface"
+              >
                 {incomeStepCopy.label}
               </label>
               <div className="relative flex items-center">
@@ -308,23 +341,25 @@ export function WorkProfileOnboarding() {
                   value={incomeDisplay}
                   onChange={(e) => setIncomeDisplay(formatThousands(e.target.value))}
                   disabled={updateProfile.isPending}
-                  className="w-full rounded-full border-2 border-transparent bg-surface-container py-5 pl-6 pr-36 text-lg font-semibold text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-primary focus:bg-surface-container-lowest focus:shadow-[0_0_0_4px_rgba(107,254,156,0.3)] disabled:opacity-50"
+                  className="w-full rounded-xl border-2 border-transparent bg-surface-container py-3.5 pl-4 pr-28 text-base font-semibold text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-primary focus:bg-surface-container-lowest focus:shadow-[0_0_0_3px_rgba(107,254,156,0.25)] disabled:opacity-50 sm:py-4 sm:pl-5 sm:pr-32 sm:text-lg"
                 />
-                <span className="pointer-events-none absolute right-6 text-lg font-bold text-on-surface-variant">
+                <span className="pointer-events-none absolute right-4 text-base font-bold text-on-surface-variant sm:right-5 sm:text-lg">
                   {incomeStepCopy.suffix}
                 </span>
               </div>
-              <p className="mt-3 pl-6 text-[0.8125rem] text-on-surface-variant">{incomeStepCopy.hint}</p>
+              <p className="mt-2 pl-1 text-xs text-on-surface-variant sm:text-[0.8125rem]">
+                {incomeStepCopy.hint}
+              </p>
             </div>
           )}
 
           {submitError && (
-            <p className="mb-6 text-sm font-medium text-error" role="alert">
+            <p className="mb-5 text-sm font-medium text-error" role="alert">
               {submitError}
             </p>
           )}
 
-          <div className="mt-12 flex flex-col-reverse gap-4 sm:flex-row">
+          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row">
             <button
               type="button"
               onClick={() => {
@@ -332,35 +367,37 @@ export function WorkProfileOnboarding() {
                 setStep(1);
               }}
               disabled={updateProfile.isPending}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-surface-container px-8 py-5 text-base font-bold text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-surface-container px-6 py-3.5 text-sm font-bold text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50 sm:text-base"
             >
-              <span className="material-symbols-outlined text-xl">arrow_back</span>
+              <span className="material-symbols-outlined text-lg">arrow_back</span>
               이전
             </button>
             <button
               type="button"
               onClick={() => void goSubmit()}
               disabled={updateProfile.isPending}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-dim px-8 py-5 text-base font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.03] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-6 py-3.5 text-sm font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 sm:text-base"
             >
               {updateProfile.isPending ? '저장 중...' : '설정 완료'}
-              {!updateProfile.isPending && <span className="material-symbols-outlined text-xl">check</span>}
+              {!updateProfile.isPending && (
+                <span className="material-symbols-outlined text-lg">check</span>
+              )}
             </button>
           </div>
         </div>
       )}
 
       {step === 3 && selectedType && (
-        <div className="no-line-boundary rounded-[2rem] bg-surface-container-lowest p-6 text-center shadow-[0_4px_60px_-15px_rgba(0,0,0,0.05)] sm:rounded-[3rem] sm:p-12">
-          <div className="animate-success-pop mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[3rem] bg-gradient-to-br from-primary to-primary-dim text-on-primary">
-            <span className="material-symbols-outlined text-5xl">verified</span>
+        <div className="no-line-boundary rounded-xl bg-surface-container-lowest p-5 text-center shadow-[0_4px_60px_-15px_rgba(0,0,0,0.05)] sm:rounded-2xl sm:p-7">
+          <div className="animate-success-pop mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-dim text-on-primary">
+            <span className="material-symbols-outlined text-4xl">verified</span>
           </div>
-          <h2 className="mb-3 text-[1.75rem] font-black text-on-surface">프로필 설정 완료!</h2>
-          <p className="mb-8 text-base leading-relaxed text-on-surface-variant">
+          <h2 className="mb-2 text-xl font-black text-on-surface sm:text-2xl">프로필 설정 완료!</h2>
+          <p className="mb-6 text-sm leading-relaxed text-on-surface-variant sm:text-[0.9375rem]">
             이제 맞춤형 한심지수를 확인할 수 있습니다.
           </p>
 
-          <div className="mb-8 rounded-3xl bg-surface-container p-6 text-left">
+          <div className="mb-6 rounded-xl bg-surface-container p-4 text-left sm:p-5">
             <div className="flex items-center justify-between border-b border-outline-variant/15 py-3 first:pt-0">
               <span className="text-sm font-semibold text-on-surface-variant">근무 유형</span>
               <span className="text-base font-extrabold text-on-surface">
@@ -369,18 +406,22 @@ export function WorkProfileOnboarding() {
             </div>
             {incomeKind !== 'NONE' && (
               <div className="flex items-center justify-between py-3 last:pb-0">
-                <span className="text-sm font-semibold text-on-surface-variant">{summaryIncomeLabel}</span>
-                <span className="text-base font-extrabold text-on-surface">{summaryIncomeText}</span>
+                <span className="text-sm font-semibold text-on-surface-variant">
+                  {summaryIncomeLabel}
+                </span>
+                <span className="text-base font-extrabold text-on-surface">
+                  {summaryIncomeText}
+                </span>
               </div>
             )}
           </div>
 
           <Link
             href="/account"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-dim px-8 py-5 text-base font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.03] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98] sm:w-auto sm:min-w-[12rem]"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-dim px-6 py-3.5 text-sm font-bold text-on-primary shadow-[0_4px_16px_-4px_rgba(0,106,53,0.35)] transition-all hover:scale-[1.02] hover:shadow-[0_8px_24px_-4px_rgba(0,106,53,0.45)] active:scale-[0.98] sm:w-auto sm:min-w-48 sm:text-base"
           >
             계정 설정으로 돌아가기
-            <span className="material-symbols-outlined text-xl">arrow_forward</span>
+            <span className="material-symbols-outlined text-lg">arrow_forward</span>
           </Link>
         </div>
       )}

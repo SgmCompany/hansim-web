@@ -28,6 +28,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 프로필 업데이트
+         * @description 근무 유형과 세전 연봉을 등록/변경합니다. 한심지수 알고리즘 선택에 사용됩니다.
+         */
+        put: operations["updateProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hansim/summary/batch": {
         parameters: {
             query?: never;
@@ -160,6 +180,32 @@ export interface components {
              * @example KR1
              */
             tagLine: string;
+        };
+        /** @description 프로필 업데이트 요청 */
+        UpdateProfileRequest: {
+            /**
+             * @description 근무 유형.
+             *     - NINE_TO_SIX: 9 to 6 직장인 (연봉 선택)
+             *     - FAIR_24H: 교대/야간 근무 (연봉 선택)
+             *     - PART_TIME: 시간제 알바 (시급 선택)
+             *     - STUDENT: 학생 — 고등학생/대학생 (소득 미수집)
+             *     - UNEMPLOYED: 백수/휴직자/프리랜서 (소득 미수집)
+             * @example NINE_TO_SIX
+             * @enum {string}
+             */
+            workType: "NINE_TO_SIX" | "FAIR_24H" | "PART_TIME" | "STUDENT" | "UNEMPLOYED";
+            /**
+             * Format: int32
+             * @description 세전 연봉 (만원 단위). NINE_TO_SIX / FAIR_24H 해당, 선택사항. 예: 5000 = 5천만원
+             * @example 5000
+             */
+            annualSalary?: number;
+            /**
+             * Format: int32
+             * @description 시급 (원 단위). PART_TIME 해당, 선택사항. 예: 10030
+             * @example 10030
+             */
+            hourlyWage?: number;
         };
         /** @description 다중 소환사 한심 지수 조회 요청 */
         BatchSummaryRequest: {
@@ -515,6 +561,24 @@ export interface components {
              * @example user@gmail.com
              */
             email: string;
+            /**
+             * @description 근무 유형. 미등록 시 null
+             * @example NINE_TO_SIX
+             * @enum {string}
+             */
+            workType?: "NINE_TO_SIX" | "FAIR_24H" | "PART_TIME" | "STUDENT" | "UNEMPLOYED";
+            /**
+             * Format: int32
+             * @description 세전 연봉 (만원 단위). NINE_TO_SIX / FAIR_24H 해당. 미등록 시 null
+             * @example 5000
+             */
+            annualSalary?: number;
+            /**
+             * Format: int32
+             * @description 시급 (원 단위). PART_TIME 해당. 미등록 시 null
+             * @example 10030
+             */
+            hourlyWage?: number;
             /** @description 연동된 소환사 정보. 미연동 시 null */
             summoner?: components["schemas"]["SummonerInfo"];
         };
@@ -597,6 +661,28 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
         responses: {
             /** @description No Content */
             204: {
