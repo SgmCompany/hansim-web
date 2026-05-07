@@ -278,6 +278,12 @@ function ResultContent() {
       document.body,
     );
 
+  const firstImpact = data.players[0]?.economicImpact;
+  const summaryFootnoteServer =
+    firstImpact != null
+      ? { basis: firstImpact.basis, hourlyRate: firstImpact.hourlyRate }
+      : null;
+
   return (
     <div
       data-comparison-layout="side-by-side"
@@ -319,7 +325,7 @@ function ResultContent() {
         </div>
       </section>
 
-      <HansimOpportunityFootnote className="max-w-prose mx-auto px-1" />
+      <HansimOpportunityFootnote serverEconomic={summaryFootnoteServer} className="max-w-prose mx-auto px-1" />
     </div>
   );
 }

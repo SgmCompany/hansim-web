@@ -11,6 +11,11 @@ type Player = components['schemas']['Player'];
 
 type Props = {
   player: Player;
+  /**
+   * 서버에 economicImpact가 없을 때만 사용하는 폴백(클라 시급).
+   * @deprecated 일반적으로 불필요
+   */
+  fallbackSalaryHourlyWon?: number | null;
   className?: string;
   variant?: 'default' | 'compact';
   showFootnote?: boolean;
@@ -18,24 +23,56 @@ type Props = {
 
 const wonFmt = new Intl.NumberFormat('ko-KR');
 
+function economicCostPrefixLabels(d: ReturnType<typeof getHansimOpportunityDisplay>): {
+  rateLabel: string;
+} {
+  if (d.fromApiEconomicImpact && d.hourlyBasisDisplayWon != null) {
+    if (d.economicBasis === 'REGISTERED_SALARY') {
+      return {
+        rateLabel: `내 급여(프로필) 환산 · 시간당 약 ${wonFmt.format(d.hourlyBasisDisplayWon)}원`,
+      };
+    }
+    return {
+      rateLabel: `서버 최저임금 환산 · 시간당 약 ${wonFmt.format(d.hourlyBasisDisplayWon)}원`,
+    };
+  }
+  if (d.hourlyBasisDisplayWon != null) {
+    return {
+      rateLabel: `프로필 급여 환산 · 시간당 약 ${wonFmt.format(d.hourlyBasisDisplayWon)}원`,
+    };
+  }
+  return {
+    rateLabel: `최저시급 ${wonFmt.format(KOREA_MINIMUM_WAGE_2026.hourlyWon)}원/시`,
+  };
+}
+
 export function HansimOpportunityPanel({
   player,
+  fallbackSalaryHourlyWon,
   className = '',
   variant = 'default',
   showFootnote: showFootnoteProp,
 }: Props) {
   const showFootnote = showFootnoteProp ?? variant === 'default';
-  const d = getHansimOpportunityDisplay(player);
+  const d = getHansimOpportunityDisplay(player, {
+    hourlyWonBasis: fallbackSalaryHourlyWon ?? undefined,
+  });
+  const { rateLabel } = economicCostPrefixLabels(d);
   const tier =
     d.hlsTotal != null ? getHlsTier(d.hlsTotal) : null;
   const highlightLines = getHlsHighlightQuips(player.hls?.detail);
+
+  const footnoteServer =
+    d.fromApiEconomicImpact && d.economicBasis != null && d.hourlyBasisDisplayWon != null
+      ? { basis: d.economicBasis, hourlyRate: d.hourlyBasisDisplayWon }
+      : null;
 
   if (variant === 'compact') {
     return (
       <div
         className={`rounded-sm bg-surface-container/90 border border-outline-variant/15 px-2.5 py-2 sm:px-3 sm:py-2.5 ${className}`.trim()}
         role="region"
-        aria-label="한심지수·플레이·최저시급 환산"
+        aria-label="한심지수·플레이·급여 환산"
       >
         {tier ? (
           <p className="text-[0.7rem] sm:text-xs text-on-surface leading-snug mb-2 pb-2 border-b border-outline-variant/10">
@@ -66,9 +103,7 @@ export function HansimOpportunityPanel({
           <div className="flex items-baseline gap-1 flex-wrap sm:ml-auto sm:text-right">
             <dt className="font-medium text-on-surface-variant">환산</dt>
             <dd>
-              <span className="text-on-surface-variant font-medium">
-                {wonFmt.format(KOREA_MINIMUM_WAGE_2026.hourlyWon)}원/시 기준{' '}
-              </span>
+              <span className="text-on-surface-variant font-medium">{rateLabel} 기준 </span>
               <span className="font-black text-primary tabular-nums">
                 약 {wonFmt.format(d.opportunityWon)}원
               </span>
@@ -76,7 +111,13 @@ export function HansimOpportunityPanel({
           </div>
         </dl>
         {showFootnote ? (
-          <HansimOpportunityFootnote className="mt-2 border-t border-outline-variant/15 pt-2" />
+          <HansimOpportunityFootnote
+            serverEconomic={footnoteServer}
+            profileSalaryHourlyWon={
+              !d.fromApiEconomicImpact ? fallbackSalaryHourlyWon ?? null : null
+            }
+            className="mt-2 border-t border-outline-variant/15 pt-2"
+          />
         ) : null}
       </div>
     );
@@ -85,7 +126,7 @@ export function HansimOpportunityPanel({
   return (
     <section
       className={`rounded-sm bg-surface-container border border-outline-variant/20 p-4 sm:p-5 space-y-4 ${className}`.trim()}
-      aria-label="한심지수 및 플레이 시간 기회비용"
+      aria-label="한심지수 및 플레이 시간 급여 환산"
     >
       {/* 1. 총점 + 등급 + 등급 멘트 */}
       {d.hlsTotal != null && tier ? (
@@ -141,7 +182,7 @@ export function HansimOpportunityPanel({
         </div>
       ) : null}
 
-      {/* 4. 플레이 + 최저임금 환산 */}
+      {/* 4. 플레이 + 급여 환산 */}
       <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 pt-3 border-t border-outline-variant/15 text-sm">
         <p className="text-on-surface leading-snug">
           <span className="font-bold text-on-surface-variant">플레이 </span>
@@ -151,14 +192,19 @@ export function HansimOpportunityPanel({
           ·
         </span>
         <p className="text-on-surface leading-snug sm:ml-auto sm:text-right">
-          <span className="text-on-surface-variant font-medium">
-            같은 시간 최저시급({wonFmt.format(KOREA_MINIMUM_WAGE_2026.hourlyWon)}원/시) 약{' '}
-          </span>
+          <span className="text-on-surface-variant font-medium">{rateLabel} 적용 </span>
           <span className="font-black text-primary tabular-nums">{wonFmt.format(d.opportunityWon)}원</span>
         </p>
       </div>
 
-      {showFootnote ? <HansimOpportunityFootnote /> : null}
+      {showFootnote ? (
+        <HansimOpportunityFootnote
+          serverEconomic={footnoteServer}
+          profileSalaryHourlyWon={
+            !d.fromApiEconomicImpact ? fallbackSalaryHourlyWon ?? null : null
+          }
+        />
+      ) : null}
     </section>
   );
 }

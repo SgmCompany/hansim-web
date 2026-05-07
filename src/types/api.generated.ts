@@ -28,6 +28,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 프로필 업데이트
+         * @description 근무 유형과 세전 연봉을 등록/변경합니다. 한심지수 알고리즘 선택에 사용됩니다.
+         */
+        put: operations["updateProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hansim/summary/batch": {
         parameters: {
             query?: never;
@@ -161,6 +181,29 @@ export interface components {
              */
             tagLine: string;
         };
+        /** @description 프로필 업데이트 요청 */
+        UpdateProfileRequest: {
+            /**
+             * @description 근무 유형.
+             *     - NINE_TO_SIX: 9 to 6 직장인 (연봉 선택)
+             *     - FAIR_24H: 교대/야간 근무 (연봉 선택)
+             *     - PART_TIME: 시간제 알바 (시급 선택)
+             *     - STUDENT: 학생 — 고등학생/대학생 (소득 미수집)
+             *     - UNEMPLOYED: 백수/휴직자/프리랜서 (소득 미수집)
+             * @example NINE_TO_SIX
+             * @enum {string}
+             */
+            workType: "NINE_TO_SIX" | "FAIR_24H" | "PART_TIME" | "STUDENT" | "UNEMPLOYED";
+            /**
+             * Format: int32
+             * @description 급여 (원 단위, 선택사항).
+             *     - NINE_TO_SIX / FAIR_24H: 세전 연봉. 예: 50000000 (5천만원)
+             *     - PART_TIME: 시급. 예: 10030
+             *     - STUDENT / UNEMPLOYED: 무시됨
+             * @example 50000000
+             */
+            salaryAmount?: number;
+        };
         /** @description 다중 소환사 한심 지수 조회 요청 */
         BatchSummaryRequest: {
             /**
@@ -230,6 +273,27 @@ export interface components {
             kda: string;
             /** @description 가장 많이 플레이한 포지션 (TOP/JUNGLE/MID/BOTTOM/UTILITY). 포지션 정보 없으면 null */
             topPosition?: string;
+        };
+        /** @description 경제적 손실 추산 (호출자 급여 기준) */
+        EconomicImpactResponse: {
+            /**
+             * Format: int32
+             * @description 적용된 시급 (원/시)
+             * @example 24038
+             */
+            hourlyRate: number;
+            /**
+             * Format: int64
+             * @description 경제적 손실 추산 (원)
+             * @example 72115
+             */
+            totalCost: number;
+            /**
+             * @description 시급 산정 근거. REGISTERED_SALARY=등록 급여, MINIMUM_WAGE=최저시급(비로그인/미등록)
+             * @example REGISTERED_SALARY
+             * @enum {string}
+             */
+            basis: "REGISTERED_SALARY" | "MINIMUM_WAGE";
         };
         /** @description HLS 부분 점수 */
         HlsDetail: {
@@ -366,6 +430,8 @@ export interface components {
             totalPlaySeconds: number;
             /** @description 한심지수 (NINE_TO_SIX 기준) */
             hls: components["schemas"]["HlsResponse"];
+            /** @description 호출자 급여 기준 경제적 손실 추산 */
+            economicImpact: components["schemas"]["EconomicImpactResponse"];
         };
         /** @description 단일 큐 통계 */
         QueueInfo: {
@@ -515,6 +581,18 @@ export interface components {
              * @example user@gmail.com
              */
             email: string;
+            /**
+             * @description 근무 유형. 미등록 시 null
+             * @example NINE_TO_SIX
+             * @enum {string}
+             */
+            workType?: "NINE_TO_SIX" | "FAIR_24H" | "PART_TIME" | "STUDENT" | "UNEMPLOYED";
+            /**
+             * Format: int32
+             * @description 급여 (원 단위). NINE_TO_SIX/FAIR_24H=연봉, PART_TIME=시급. STUDENT/UNEMPLOYED는 null
+             * @example 50000000
+             */
+            salaryAmount?: number;
             /** @description 연동된 소환사 정보. 미연동 시 null */
             summoner?: components["schemas"]["SummonerInfo"];
         };
@@ -597,6 +675,28 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
         responses: {
             /** @description No Content */
             204: {
