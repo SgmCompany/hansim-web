@@ -8,6 +8,7 @@ import { Footer } from '@/src/components/Footer';
 import { SummonerSearchPanel } from '@/src/components/SummonerSearchPanel';
 import { formatDateToInput, getToday, normalizeSummaryDateRange } from '@/src/utils/date';
 import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
+import { useMe } from '@/src/lib/api/hooks/useMe';
 import {
   getTierKoreanName,
   getRankKoreanName,
@@ -29,6 +30,7 @@ import { formatPlayDurationMinutes, formatPlayDurationSeconds } from '@/src/util
 import { LeaderboardSection } from '@/src/components/LeaderboardSection';
 import { buildHlsLeaderboardRows, HANSIM_KING_TOP_N } from '@/src/utils/hlsLeaderboard';
 import { SummaryJumpNav } from '@/src/components/SummaryJumpNav';
+import { getSalaryHourlyWonFromMe } from '@/src/utils/salaryHourlyRate';
 
 type Player = components['schemas']['Player'];
 
@@ -116,6 +118,9 @@ function ResultContent() {
   }, [rawStart, rawEnd, today, searchParams, router]);
 
   const { data, isLoading, isError, error } = useBatchSummary(summoners, startDate, endDate);
+
+  const { data: meProfile } = useMe();
+  const salaryHourlyWon = useMemo(() => getSalaryHourlyWonFromMe(meProfile), [meProfile]);
 
   const initialSummonerInput = summoners.join(', ');
   const initialStart = startDate ?? today;
@@ -314,17 +319,30 @@ function ResultContent() {
       <section id="summary-section-detail" className="min-w-0 scroll-mt-4">
         <div className="summary-comparison-grid w-full min-w-0">
           {data.players.map((player, index) => (
-            <PlayerCard key={`${index}-${player.riotId}`} player={player} playerIndex={index} />
+            <PlayerCard
+              key={`${index}-${player.riotId}`}
+              player={player}
+              playerIndex={index}
+              salaryHourlyWon={salaryHourlyWon}
+            />
           ))}
         </div>
       </section>
 
-      <HansimOpportunityFootnote className="max-w-prose mx-auto px-1" />
+      <HansimOpportunityFootnote profileSalaryHourlyWon={salaryHourlyWon} className="max-w-prose mx-auto px-1" />
     </div>
   );
 }
 
-function PlayerCard({ player, playerIndex }: { player: Player; playerIndex: number }) {
+function PlayerCard({
+  player,
+  playerIndex,
+  salaryHourlyWon,
+}: {
+  player: Player;
+  playerIndex: number;
+  salaryHourlyWon?: number | null;
+}) {
   const { data: version } = useLatestVersion();
   const lanePreference = summarizeLaneFromChampions(player.topChampions);
 
@@ -402,7 +420,12 @@ function PlayerCard({ player, playerIndex }: { player: Player; playerIndex: numb
         </div>
       </header>
 
-      <HansimOpportunityPanel player={player} variant="compact" className="min-w-0" />
+      <HansimOpportunityPanel
+        player={player}
+        variant="compact"
+        salaryHourlyWon={salaryHourlyWon}
+        className="min-w-0"
+      />
 
       <section className="min-w-0" aria-labelledby={`summary-queue-heading-${playerIndex}`}>
         <h3

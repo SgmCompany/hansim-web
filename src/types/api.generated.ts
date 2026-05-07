@@ -196,16 +196,13 @@ export interface components {
             workType: "NINE_TO_SIX" | "FAIR_24H" | "PART_TIME" | "STUDENT" | "UNEMPLOYED";
             /**
              * Format: int32
-             * @description 세전 연봉 (만원 단위). NINE_TO_SIX / FAIR_24H 해당, 선택사항. 예: 5000 = 5천만원
-             * @example 5000
+             * @description 급여 (원 단위, 선택사항).
+             *     - NINE_TO_SIX / FAIR_24H: 세전 연봉. 예: 50000000 (5천만원)
+             *     - PART_TIME: 시급. 예: 10030
+             *     - STUDENT / UNEMPLOYED: 무시됨
+             * @example 50000000
              */
-            annualSalary?: number;
-            /**
-             * Format: int32
-             * @description 시급 (원 단위). PART_TIME 해당, 선택사항. 예: 10030
-             * @example 10030
-             */
-            hourlyWage?: number;
+            salaryAmount?: number;
         };
         /** @description 다중 소환사 한심 지수 조회 요청 */
         BatchSummaryRequest: {
@@ -569,16 +566,10 @@ export interface components {
             workType?: "NINE_TO_SIX" | "FAIR_24H" | "PART_TIME" | "STUDENT" | "UNEMPLOYED";
             /**
              * Format: int32
-             * @description 세전 연봉 (만원 단위). NINE_TO_SIX / FAIR_24H 해당. 미등록 시 null
-             * @example 5000
+             * @description 급여 (원 단위). NINE_TO_SIX/FAIR_24H=연봉, PART_TIME=시급. STUDENT/UNEMPLOYED는 null
+             * @example 50000000
              */
-            annualSalary?: number;
-            /**
-             * Format: int32
-             * @description 시급 (원 단위). PART_TIME 해당. 미등록 시 null
-             * @example 10030
-             */
-            hourlyWage?: number;
+            salaryAmount?: number;
             /** @description 연동된 소환사 정보. 미연동 시 null */
             summoner?: components["schemas"]["SummonerInfo"];
         };

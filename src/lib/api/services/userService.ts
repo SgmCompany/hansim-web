@@ -14,16 +14,20 @@ export async function getMe() {
   return apiGet<MyProfileResponse>('/api/v1/users/me');
 }
 
-/** 소득 입력값(숫자만). 미입력이면 null → 요청 본문에서 해당 필드 생략 */
+/**
+ * 소득 입력값 → API `salaryAmount`(원 단위).
+ * - 연봉형: 화면 만원 정수 → × 10_000
+ * - 알바 시급: 이미 원 단위 정수
+ */
 export function buildUpdateProfileRequest(
   workType: UpdateProfileRequest['workType'],
   incomeParsed: number | null,
 ): UpdateProfileRequest {
   const body: UpdateProfileRequest = { workType };
   if (workType === 'NINE_TO_SIX' || workType === 'FAIR_24H') {
-    if (incomeParsed !== null) body.annualSalary = incomeParsed;
+    if (incomeParsed !== null) body.salaryAmount = incomeParsed * 10000;
   } else if (workType === 'PART_TIME') {
-    if (incomeParsed !== null) body.hourlyWage = incomeParsed;
+    if (incomeParsed !== null) body.salaryAmount = incomeParsed;
   }
   return body;
 }

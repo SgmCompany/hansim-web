@@ -12,12 +12,14 @@ import { TopChampionsStrip } from '@/src/components/TopChampionsStrip';
 import { SummonerSearchPanel } from '@/src/components/SummonerSearchPanel';
 import { formatDateToInput, getToday, normalizeSummaryDateRange } from '@/src/utils/date';
 import { useBatchSummary } from '@/src/lib/api/hooks/useSummary';
+import { useMe } from '@/src/lib/api/hooks/useMe';
 import { getProfileIconUrl, useLatestVersion, getTierKoreanName, getRankKoreanName, getTierColor } from '@/src/lib/ddragon';
 import { getPrimaryQueue } from '@/src/utils/queue';
 import { summarizeLaneFromChampions } from '@/src/utils/lanePreference';
 import { dedupeSummonerRiotIds, normalizeSummonerSearchToken } from '@/src/utils/riotId';
 import { HansimOpportunityPanel } from '@/src/components/HansimOpportunityPanel';
 import { HlsTierTable } from '@/src/components/HlsTierTable';
+import { getSalaryHourlyWonFromMe } from '@/src/utils/salaryHourlyRate';
 
 type PageProps = {
   params: Promise<{ name: string }>;
@@ -84,6 +86,8 @@ function SummonerContent({ name }: { name: string }) {
     startDate,
     endDate,
   );
+  const { data: meProfile } = useMe();
+  const salaryHourlyWon = useMemo(() => getSalaryHourlyWonFromMe(meProfile), [meProfile]);
   const { data: version } = useLatestVersion();
 
   const initialSummonerInput = data?.players[0]?.riotId ?? decodedName;
@@ -274,7 +278,7 @@ function SummonerContent({ name }: { name: string }) {
 
       <HlsTierTable variant="compact" collapsible className="w-full max-w-none" />
 
-      <HansimOpportunityPanel player={player} className="min-w-0 w-full" />
+      <HansimOpportunityPanel player={player} salaryHourlyWon={salaryHourlyWon} className="min-w-0 w-full" />
 
       {/*
         모바일: 프로필 → 멀티킬 → 챔피언 → 통계 (order-1~4)

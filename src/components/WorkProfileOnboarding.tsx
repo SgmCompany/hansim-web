@@ -143,10 +143,10 @@ export function WorkProfileOnboarding() {
     setIncomeKind(selectedOption.incomeKind);
     if (me?.workType === selectedType) {
       if (selectedType === 'NINE_TO_SIX' || selectedType === 'FAIR_24H') {
-        const v = me.annualSalary;
-        setIncomeDisplay(v != null ? formatThousands(String(v)) : '');
+        const v = me.salaryAmount;
+        setIncomeDisplay(v != null ? formatThousands(String(Math.round(v / 10000))) : '');
       } else if (selectedType === 'PART_TIME') {
-        const v = me.hourlyWage;
+        const v = me.salaryAmount;
         setIncomeDisplay(v != null ? formatThousands(String(v)) : '');
       } else {
         setIncomeDisplay('');
@@ -182,7 +182,7 @@ export function WorkProfileOnboarding() {
       : summaryIncome !== null
         ? incomeKind === 'HOURLY'
           ? `${summaryIncome.toLocaleString('ko-KR')}원`
-          : `${summaryIncome.toLocaleString('ko-KR')}만원`
+          : `${(summaryIncome * 10000).toLocaleString('ko-KR')}원`
         : '미입력';
 
   return (

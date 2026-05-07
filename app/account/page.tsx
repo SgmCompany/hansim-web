@@ -87,19 +87,19 @@ export default function AccountPage() {
                 <span className="text-on-surface-variant">유형 </span>
                 <span className="font-extrabold text-on-surface">{WORK_TYPE_LABELS[me.workType]}</span>
               </p>
-              {(me.workType === 'NINE_TO_SIX' || me.workType === 'FAIR_24H') && me.annualSalary != null && (
+              {(me.workType === 'NINE_TO_SIX' || me.workType === 'FAIR_24H') && me.salaryAmount != null && (
                 <p>
                   <span className="text-on-surface-variant">세전 연봉 </span>
                   <span className="font-bold text-on-surface tabular-nums">
-                    {me.annualSalary.toLocaleString('ko-KR')}만원
+                    {me.salaryAmount.toLocaleString('ko-KR')}원
                   </span>
                 </p>
               )}
-              {me.workType === 'PART_TIME' && me.hourlyWage != null && (
+              {me.workType === 'PART_TIME' && me.salaryAmount != null && (
                 <p>
                   <span className="text-on-surface-variant">시급 </span>
                   <span className="font-bold text-on-surface tabular-nums">
-                    {me.hourlyWage.toLocaleString('ko-KR')}원
+                    {me.salaryAmount.toLocaleString('ko-KR')}원
                   </span>
                 </p>
               )}
