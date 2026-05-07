@@ -11,8 +11,11 @@ type Player = components['schemas']['Player'];
 
 type Props = {
   player: Player;
-  /** 로그인 사용자 근무 프로필에서 유도한 시간당 단가(원). 있으면 플레이 환산에 사용 */
-  salaryHourlyWon?: number | null;
+  /**
+   * 서버에 economicImpact가 없을 때만 사용하는 폴백(클라 시급).
+   * @deprecated 일반적으로 불필요
+   */
+  fallbackSalaryHourlyWon?: number | null;
   className?: string;
   variant?: 'default' | 'compact';
   showFootnote?: boolean;
@@ -20,20 +23,49 @@ type Props = {
 
 const wonFmt = new Intl.NumberFormat('ko-KR');
 
+function economicCostPrefixLabels(d: ReturnType<typeof getHansimOpportunityDisplay>): {
+  rateLabel: string;
+} {
+  if (d.fromApiEconomicImpact && d.hourlyBasisDisplayWon != null) {
+    if (d.economicBasis === 'REGISTERED_SALARY') {
+      return {
+        rateLabel: `내 급여(프로필) 환산 · 시간당 약 ${wonFmt.format(d.hourlyBasisDisplayWon)}원`,
+      };
+    }
+    return {
+      rateLabel: `서버 최저임금 환산 · 시간당 약 ${wonFmt.format(d.hourlyBasisDisplayWon)}원`,
+    };
+  }
+  if (d.hourlyBasisDisplayWon != null) {
+    return {
+      rateLabel: `프로필 급여 환산 · 시간당 약 ${wonFmt.format(d.hourlyBasisDisplayWon)}원`,
+    };
+  }
+  return {
+    rateLabel: `최저시급 ${wonFmt.format(KOREA_MINIMUM_WAGE_2026.hourlyWon)}원/시`,
+  };
+}
+
 export function HansimOpportunityPanel({
   player,
-  salaryHourlyWon,
+  fallbackSalaryHourlyWon,
   className = '',
   variant = 'default',
   showFootnote: showFootnoteProp,
 }: Props) {
   const showFootnote = showFootnoteProp ?? variant === 'default';
   const d = getHansimOpportunityDisplay(player, {
-    hourlyWonBasis: salaryHourlyWon ?? undefined,
+    hourlyWonBasis: fallbackSalaryHourlyWon ?? undefined,
   });
+  const { rateLabel } = economicCostPrefixLabels(d);
   const tier =
     d.hlsTotal != null ? getHlsTier(d.hlsTotal) : null;
   const highlightLines = getHlsHighlightQuips(player.hls?.detail);
+
+  const footnoteServer =
+    d.fromApiEconomicImpact && d.economicBasis != null && d.hourlyBasisDisplayWon != null
+      ? { basis: d.economicBasis, hourlyRate: d.hourlyBasisDisplayWon }
+      : null;
 
   if (variant === 'compact') {
     return (
@@ -71,15 +103,7 @@ export function HansimOpportunityPanel({
           <div className="flex items-baseline gap-1 flex-wrap sm:ml-auto sm:text-right">
             <dt className="font-medium text-on-surface-variant">환산</dt>
             <dd>
-              {d.hourlyBasisDisplayWon != null ? (
-                <span className="text-on-surface-variant font-medium">
-                  프로필 급여 (시간당 약 {wonFmt.format(d.hourlyBasisDisplayWon)}원) 기준{' '}
-                </span>
-              ) : (
-                <span className="text-on-surface-variant font-medium">
-                  최저시급 {wonFmt.format(KOREA_MINIMUM_WAGE_2026.hourlyWon)}원/시 기준{' '}
-                </span>
-              )}
+              <span className="text-on-surface-variant font-medium">{rateLabel} 기준 </span>
               <span className="font-black text-primary tabular-nums">
                 약 {wonFmt.format(d.opportunityWon)}원
               </span>
@@ -88,7 +112,10 @@ export function HansimOpportunityPanel({
         </dl>
         {showFootnote ? (
           <HansimOpportunityFootnote
-            profileSalaryHourlyWon={salaryHourlyWon ?? null}
+            serverEconomic={footnoteServer}
+            profileSalaryHourlyWon={
+              !d.fromApiEconomicImpact ? fallbackSalaryHourlyWon ?? null : null
+            }
             className="mt-2 border-t border-outline-variant/15 pt-2"
           />
         ) : null}
@@ -165,21 +192,18 @@ export function HansimOpportunityPanel({
           ·
         </span>
         <p className="text-on-surface leading-snug sm:ml-auto sm:text-right">
-          {d.hourlyBasisDisplayWon != null ? (
-            <span className="text-on-surface-variant font-medium">
-              프로필 급여 환산 · 시간당 약 {wonFmt.format(d.hourlyBasisDisplayWon)}원 적용{' '}
-            </span>
-          ) : (
-            <span className="text-on-surface-variant font-medium">
-              같은 시간 최저시급({wonFmt.format(KOREA_MINIMUM_WAGE_2026.hourlyWon)}원/시) 환산{' '}
-            </span>
-          )}
+          <span className="text-on-surface-variant font-medium">{rateLabel} 적용 </span>
           <span className="font-black text-primary tabular-nums">{wonFmt.format(d.opportunityWon)}원</span>
         </p>
       </div>
 
       {showFootnote ? (
-        <HansimOpportunityFootnote profileSalaryHourlyWon={salaryHourlyWon ?? null} />
+        <HansimOpportunityFootnote
+          serverEconomic={footnoteServer}
+          profileSalaryHourlyWon={
+            !d.fromApiEconomicImpact ? fallbackSalaryHourlyWon ?? null : null
+          }
+        />
       ) : null}
     </section>
   );

@@ -274,6 +274,27 @@ export interface components {
             /** @description 가장 많이 플레이한 포지션 (TOP/JUNGLE/MID/BOTTOM/UTILITY). 포지션 정보 없으면 null */
             topPosition?: string;
         };
+        /** @description 경제적 손실 추산 (호출자 급여 기준) */
+        EconomicImpactResponse: {
+            /**
+             * Format: int32
+             * @description 적용된 시급 (원/시)
+             * @example 24038
+             */
+            hourlyRate: number;
+            /**
+             * Format: int64
+             * @description 경제적 손실 추산 (원)
+             * @example 72115
+             */
+            totalCost: number;
+            /**
+             * @description 시급 산정 근거. REGISTERED_SALARY=등록 급여, MINIMUM_WAGE=최저시급(비로그인/미등록)
+             * @example REGISTERED_SALARY
+             * @enum {string}
+             */
+            basis: "REGISTERED_SALARY" | "MINIMUM_WAGE";
+        };
         /** @description HLS 부분 점수 */
         HlsDetail: {
             /**
@@ -409,6 +430,8 @@ export interface components {
             totalPlaySeconds: number;
             /** @description 한심지수 (NINE_TO_SIX 기준) */
             hls: components["schemas"]["HlsResponse"];
+            /** @description 호출자 급여 기준 경제적 손실 추산 */
+            economicImpact: components["schemas"]["EconomicImpactResponse"];
         };
         /** @description 단일 큐 통계 */
         QueueInfo: {
